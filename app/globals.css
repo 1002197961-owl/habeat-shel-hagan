@@ -1,0 +1,181 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────
+   Brand CSS Custom Properties
+───────────────────────────────────────────── */
+:root {
+  --brand-pink:   #FF4DA6;
+  --brand-orange: #FFA500;
+  --brand-yellow: #FFD600;
+  --brand-green:  #22C55E;
+  --brand-cyan:   #00B4E6;
+  --brand-purple: #8B5CF6;
+  --brand-navy:   #1E1B4B;
+  --brand-rose:   #f43f5e;
+
+  --gradient-home:   linear-gradient(180deg, #160d38 0%, #0b1730 100%);
+  --shadow-card:     0 4px 20px rgba(0, 0, 0, 0.07);
+  --shadow-nav:      0 8px 32px rgba(0, 0, 0, 0.28);
+  --radius-card:     20px;
+  --radius-btn:      14px;
+}
+
+/* ─────────────────────────────────────────────
+   Base Reset & RTL
+───────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  direction: rtl;
+  scroll-behavior: smooth;
+}
+
+body {
+  direction: rtl;
+  background: #f1f3f5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Hide scrollbar visually, keep functional */
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* Native inputs RTL */
+input,
+textarea,
+select {
+  text-align: right;
+  direction: rtl;
+}
+
+/* Remove iOS tap highlight */
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ─────────────────────────────────────────────
+   Keyframe Animations
+───────────────────────────────────────────── */
+@keyframes waveBar {
+  0%   { transform: scaleY(0.35); }
+  100% { transform: scaleY(1.25); }
+}
+
+@keyframes floatUp {
+  0%, 100% { transform: translateY(0px); }
+  50%      { transform: translateY(-10px); }
+}
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseSoft {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.05); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.15; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes recordingPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  50%      { box-shadow: 0 0 0 14px rgba(239, 68, 68, 0); }
+}
+
+/* ─────────────────────────────────────────────
+   Shared Component Styles (@layer components)
+───────────────────────────────────────────── */
+@layer components {
+  /* Base card */
+  .card {
+    @apply bg-white rounded-card p-4 shadow-card;
+  }
+
+  /* Frosted glass card (used on dark bg) */
+  .card-glass {
+    background: rgba(255, 255, 255, 0.07);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1.5px solid rgba(255, 255, 255, 0.14);
+    border-radius: 28px;
+  }
+
+  /* Gradient nav card */
+  .nav-card {
+    @apply rounded-card border-2 border-white/20 text-center cursor-pointer;
+    @apply transition-transform duration-150 active:scale-95;
+    box-shadow: var(--shadow-nav);
+    user-select: none;
+  }
+
+  /* Animated wave bar (use CSS vars for timing) */
+  .wave-bar {
+    border-radius: 3px;
+    transform-origin: bottom;
+    animation: waveBar var(--wave-dur) ease-in-out var(--wave-delay) infinite alternate;
+  }
+
+  /* Floating decoration */
+  .float-note {
+    animation: floatUp var(--float-dur, 3s) ease-in-out var(--float-delay, 0s) infinite;
+  }
+
+  /* Utility: fade + slide up on mount */
+  .fade-up {
+    animation: fadeSlideUp 0.38s ease both;
+  }
+
+  /* Pill / badge */
+  .pill {
+    @apply inline-flex items-center rounded-pill px-2.5 py-0.5 text-xs font-bold;
+    border: 1.5px solid;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   Utilities
+───────────────────────────────────────────── */
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .text-shadow-glow-pink {
+    text-shadow: 0 0 28px rgba(255, 77, 166, 0.55);
+  }
+
+  .text-shadow-sm {
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Gradient backgrounds */
+  .bg-home {
+    background: var(--gradient-home);
+  }
+}
