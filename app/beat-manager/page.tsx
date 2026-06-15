@@ -8,9 +8,10 @@ import { Card }          from '@/components/ui/Card'
 import { Pill }          from '@/components/ui/Pill'
 import { Btn }           from '@/components/ui/Btn'
 import { WaveBar }       from '@/components/ui/WaveBar'
-import { StatBadge }     from '@/components/ui/StatBadge'
-import { SectionHeader } from '@/components/ui/SectionHeader'
-import { BRAND }         from '@/lib/constants'
+import { StatBadge }       from '@/components/ui/StatBadge'
+import { SectionHeader }   from '@/components/ui/SectionHeader'
+import { DifficultyBadge } from '@/components/ui/DifficultyBadge'
+import { BRAND }           from '@/lib/constants'
 import { MOCK_SONGS, PILOT_STATIONS } from '@/lib/mockData'
 
 type Step = 'practice' | 'song-select' | 'instrument-select'
@@ -83,7 +84,8 @@ export default function BeatManagerPage() {
                     display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{song.emoji}</div>
                   <div style={{ flex: 1 }}>
                     <div className="font-black" style={{ fontSize: 15, color: BRAND.navy }}>{song.title}</div>
-                    <div style={{ fontSize: 12, color: '#9ca3af' }}>{song.artist} · {song.duration}</div>
+                    <div style={{ fontSize: 12, color: '#9ca3af', marginBottom: 5 }}>{song.artist} · {song.duration}</div>
+                    {song.difficulty && <DifficultyBadge difficulty={song.difficulty} />}
                   </div>
                   {songId === song.id && <Pill color={song.color}>✓</Pill>}
                 </Card>
