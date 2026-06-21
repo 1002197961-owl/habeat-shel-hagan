@@ -43,7 +43,7 @@ lib/
   mockData.ts          # Mock data (songs, gardens, stations)
   utils.ts             # cn() helper
 
-store/
+store
   appStore.ts          # Zustand global state
 ```
 
