@@ -8,7 +8,6 @@ import { Card }          from '@/components/ui/Card'
 import { Pill }          from '@/components/ui/Pill'
 import { Toggle }        from '@/components/ui/Toggle'
 import { StatBadge }     from '@/components/ui/StatBadge'
-import { SectionHeader } from '@/components/ui/SectionHeader'
 import { BRAND }         from '@/lib/constants'
 import { PILOT_STATIONS } from '@/lib/mockData'
 

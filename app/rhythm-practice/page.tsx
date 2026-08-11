@@ -150,7 +150,7 @@ export default function RhythmPracticePage() {
     }
   }, [isRecording, selectedSong])
 
-  const { devices, supported, error, requestAccess } = useMIDI(handleMIDIEvent)
+  const { devices, requestAccess } = useMIDI(handleMIDIEvent)
 
   // Simulate demo device if no MIDI connected (for development/preview)
   const displayDevices = devices.length > 0 ? devices : [
