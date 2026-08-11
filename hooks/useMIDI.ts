@@ -71,6 +71,7 @@ export function useMIDI(onEvent?: (e: MIDIEvent) => void): UseMIDIReturn {
     Array.from(access.inputs.values()).forEach((input, i) => {
       const device = resolveDevice(input, i)
       input.onmidimessage = (msg: MIDIMessageEvent) => {
+        if (!msg.data) return
         const [status, note, velocity] = Array.from(msg.data)
         const isNoteOn  = (status & 0xf0) === 0x90 && velocity > 0
         const isNoteOff = (status & 0xf0) === 0x80 || ((status & 0xf0) === 0x90 && velocity === 0)
@@ -102,7 +103,7 @@ export function useMIDI(onEvent?: (e: MIDIEvent) => void): UseMIDIReturn {
   const requestAccess = useCallback(async () => {
     if (!supported) { setError('הדפדפן לא תומך ב-Web MIDI API'); return }
     try {
-      const access = await (navigator as any).requestMIDIAccess({ sysex: false })
+      const access = await navigator.requestMIDIAccess({ sysex: false })
       accessRef.current = access
       buildDeviceList(access)
       attachListeners(access)
@@ -110,7 +111,7 @@ export function useMIDI(onEvent?: (e: MIDIEvent) => void): UseMIDIReturn {
         buildDeviceList(access)
         attachListeners(access)
       }
-    } catch (e) {
+    } catch {
       setError('לא ניתן לגשת לכלי MIDI. ודא שהכלי מחובר ב-USB ואשר גישה בדפדפן.')
     }
   }, [supported, buildDeviceList, attachListeners])

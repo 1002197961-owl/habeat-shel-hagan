@@ -13,14 +13,6 @@ import { SectionHeader } from '@/components/ui/SectionHeader'
 import { BRAND }         from '@/lib/constants'
 
 const GROUPS  = ['כל הגן', 'קבוצה א׳', 'קבוצה ב׳', 'מועדון']
-const SCREENS_LIST = [
-  { id: 'beat',   label: 'מנהל הביט',        emoji: '🎛️', href: '/beat-manager'  },
-  { id: 'song',   label: 'שיר הקסם',          emoji: '⭐', href: '/magic-song'    },
-  { id: 'station',label: 'תחנות נגינה',       emoji: '🎸', href: '/stations'      },
-  { id: 'rec',    label: 'הקלטה',             emoji: '🎤', href: '/recording'     },
-  { id: 'lib',    label: 'ספרייה',            emoji: '📂', href: '/library'       },
-]
-
 const SETTINGS_LIST = [
   { key: 'lockScreens',    emoji: '🔒', label: 'נעילת מסכים',     desc: 'מונע מעבר חופשי בין מסכים'    },
   { key: 'quietMode',      emoji: '🔇', label: 'מצב שקט',          desc: 'פעולה ללא סאונד חיצוני'       },
