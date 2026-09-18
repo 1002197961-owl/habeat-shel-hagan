@@ -4,6 +4,14 @@ import { getCatalogClient, loadSongCatalog } from '../lib/server/songCatalog'
 afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals() })
 
 describe('catalog configuration and failure behavior', () => {
+  it('uses the approved shared project when there is no environment override', async () => {
+    vi.stubEnv('SUPABASE_URL', undefined)
+    vi.stubEnv('SUPABASE_PUBLISHABLE_KEY', undefined)
+    const fetchMock = vi.fn().mockResolvedValue(new Response('[]', { status: 200 }))
+    vi.stubGlobal('fetch', fetchMock)
+    expect((await loadSongCatalog()).source).toBe('supabase')
+    expect(String(fetchMock.mock.calls[0][0])).toContain('https://oqwzjhqzjfhdlploezad.supabase.co/rest/v1/song_catalog')
+  })
   it('works without an account and identifies the built-in source', async () => {
     vi.stubEnv('SUPABASE_URL', '')
     vi.stubEnv('SUPABASE_PUBLISHABLE_KEY', '')
