@@ -1,0 +1,56 @@
+.library { padding: 16px; color: #1e1b4b; }
+.library button, .library select, .library input { font: inherit; }
+.library button { cursor: pointer; min-height: 44px; }
+.library button:disabled { cursor: default; opacity: .6; }
+.library :is(button, input, select, summary):focus-visible { outline: 3px solid #8b5cf6; outline-offset: 3px; }
+.intro h1 { font-size: 23px; font-weight: 900; margin: 0; }
+.intro p { color: #52615b; font-size: 13px; margin: 5px 0 16px; }
+.player, .filters, .songCard { border-radius: 20px; background: white; box-shadow: 0 4px 20px #1e1b4b09; }
+.player { padding: 16px; border: 1px solid #22c55e55; margin-bottom: 14px; }
+.playerHeading { display: flex; gap: 12px; align-items: center; }
+.cover { flex-shrink: 0; width: 56px; height: 56px; display: grid; place-items: center; border-radius: 16px; font-size: 32px; }
+.eyebrow { color: #15803d; font-size: 11px; font-weight: 800; }
+.player h2 { font-size: 19px; font-weight: 900; margin: 0; }
+.playerHeading p { font-size: 11px; color: #52615b; margin: 3px 0 0; }
+.player audio { display: block; width: 100%; margin: 12px 0 8px; height: 44px; direction: ltr; }
+.playerOptions, .filterRow { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.playerOptions label { display: flex; align-items: center; gap: 5px; font-size: 12px; }
+.playerOptions select, .filters select { border: 1px solid #cbd5e1; border-radius: 10px; background: #f8fafc; min-height: 44px; padding: 4px; max-width: 135px; }
+.playerOptions input, .check input { width: 18px; height: 18px; accent-color: #15803d; }
+.practice { margin-top: 10px; border-top: 1px solid #e2e8f0; padding-top: 8px; }
+.practice summary { font-size: 13px; font-weight: 800; padding: 8px 0; cursor: pointer; }
+.practice p { font-size: 12px; color: #475569; line-height: 1.7; margin: 8px 0; }
+.beats { display: flex; gap: 6px; flex-wrap: wrap; }
+.beat { flex: 1; min-width: 54px; border: 2px solid; border-radius: 12px; padding: 6px 2px; text-align: center; }
+.beat > span { display: block; font-size: 22px; }
+.beat small { font-size: 10px; display: block; }
+.practice .hint { font-size: 11px; }
+.filters { padding: 13px; }
+.search { font-size: 12px; font-weight: 800; display: block; }
+.search input { display: block; width: 100%; border: 1px solid #cbd5e1; border-radius: 12px; padding: 10px 12px; margin: 6px 0 10px; min-height: 44px; font-size: 15px; background: #f8fafc; }
+.filterRow label { font-size: 12px; display: flex; align-items: center; gap: 6px; }
+.filterRow button { border: 1px solid #cbd5e1; border-radius: 12px; background: white; padding: 7px 9px; font-size: 12px; font-weight: 800; }
+.filterRow button.selected { background: #fef3c7; border-color: #f59e0b; }
+.check { min-height: 40px; display: flex; align-items: center; gap: 7px; font-size: 12px; margin-top: 8px; }
+.results { font-size: 12px; color: #52615b; margin: 14px 2px 8px; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.songCard { padding: 12px; border: 2px solid transparent; display: flex; flex-direction: column; }
+.songTop { display: flex; justify-content: space-between; align-items: center; }
+.songEmoji { width: 46px; height: 46px; border-radius: 13px; display: grid; place-items: center; font-size: 28px; }
+.star { border: none; background: none; color: #9a6700; font-size: 27px !important; min-width: 44px; }
+.songCard h2 { font-size: 15px; font-weight: 900; line-height: 1.5; margin: 9px 0 3px; }
+.artist { font-size: 10px; color: #52615b; line-height: 1.6; margin: 0 0 8px; }
+.tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: auto; }
+.tags span { background: #f1f5f9; border-radius: 6px; font-size: 10px; padding: 3px 5px; }
+.duration { display: flex; justify-content: space-between; gap: 5px; font-size: 10px; color: #52615b; margin: 10px 0; }
+.play { width: 100%; border: none; border-radius: 11px; background: #15803d; color: white; font-weight: 800 !important; font-size: 13px !important; }
+.play:disabled { color: #475569; background: #e2e8f0; opacity: 1 !important; font-size: 11px !important; }
+.empty { text-align: center; padding: 24px 16px; background: white; border-radius: 16px; font-size: 14px; }
+.empty > span { font-size: 32px; }
+.empty button, .pagination button { border: 1px solid #cbd5e1; padding: 6px 16px; border-radius: 12px; background: white; color: #1e1b4b; }
+.pagination { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 16px 0; font-size: 13px; }
+.footer { font-size: 11px; color: #52615b; line-height: 1.8; text-align: center; padding: 12px 6px 0; }
+.notice, .error { padding: 10px; border-radius: 12px; background: #fff7ed; color: #9a3412; font-size: 12px; line-height: 1.8; margin: 10px 0; }
+.error button { text-decoration: underline; padding: 4px 8px; }
+@media (max-width: 360px) { .library { padding: 10px; } .playerOptions { flex-wrap: wrap; } .songCard { padding: 8px; } .filterRow { flex-wrap: wrap; } }
+@media (prefers-reduced-motion: reduce) { .beat { transform: none !important; } }
