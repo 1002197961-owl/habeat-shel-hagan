@@ -41,3 +41,4 @@ Thumbs.db
 *.pem
 .vercel
 .turbo
+supabase/.temp/
