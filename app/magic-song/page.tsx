@@ -8,6 +8,8 @@ import { Card }          from '@/components/ui/Card'
 import { Btn }           from '@/components/ui/Btn'
 import { WaveBar }       from '@/components/ui/WaveBar'
 import { BRAND }         from '@/lib/constants'
+import { speakHebrew } from '@/lib/audio'
+import Link from 'next/link'
 
 const QUESTIONS = [
   { q: 'על מה יהיה השיר?', emoji: '🎵', hint: 'בחרו נושא',
@@ -41,8 +43,8 @@ const buildSong = (answers: Record<number, string>) => {
   const magic  = answers[9] || 'קסם'
   return [
     `${hero} יוצא לחפש ${theme}, 🌟`,
-    `${feel} מלאה בלב כשהוא ${action}, 💫`,
-    `ב${place} הקסום "${magic}" ממלא הכל, ✨`,
+    `הלב מלא ${feel}, והגיבור שלנו ${action}, 💫`,
+    `במקום שנקרא ${place}, המילה "${magic}" מוסיפה קסם, ✨`,
     `זה השיר שלנו — הביט של הגן! 🎉`,
   ]
 }
@@ -58,6 +60,7 @@ export default function MagicSongPage() {
   const [teacherNotes, setTeacherNotes] = useState<Record<number, string>>({})
   const [song, setSong] = useState<string[]>([])
   const [saved, setSaved] = useState(false)
+  const [notice, setNotice] = useState('')
 
   const q = QUESTIONS[qIdx]
   const totalQ = QUESTIONS.length
@@ -75,14 +78,14 @@ export default function MagicSongPage() {
     setFreeText('')
   }
 
-  const generate = () => {
+  const generate = (finalWord?: string) => {
     setFlowStep('generating')
-    setTimeout(() => { setSong(buildSong(answers)); setFlowStep('result') }, 2200)
+    setTimeout(() => { setSong(buildSong(finalWord ? { ...answers, 9: finalWord } : answers)); setFlowStep('result') }, 2200)
   }
 
   const reset = () => {
     setQIdx(0); setAnswers({}); setFreeText(''); setSong([])
-    setSaved(false); setShowTeacher(false); setTeacherNotes({})
+    setSaved(false); setShowTeacher(false); setTeacherNotes({}); setNotice('')
     setFlowStep('questions')
   }
 
@@ -90,9 +93,10 @@ export default function MagicSongPage() {
     return (
       <AppShell bg="#fffbeb">
         <BackHeader title="שיר הקסם ⭐" bg={BRAND.orange} />
+      <div className="px-4 pt-3"><Link href="/guide" className="inline-block rounded-xl bg-white px-3 py-2 text-sm font-bold text-indigo-800 shadow-sm">🎬 איך יוצרים שיר?</Link></div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '70vh', gap: 20 }}>
           <motion.div animate={{ rotate: 360 }} transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }} style={{ fontSize: 64 }}>✨</motion.div>
-          <div className="font-black" style={{ fontSize: 22, color: BRAND.navy }}>יוצר שיר קסום...</div>
+          <div className="font-black" style={{ fontSize: 22, color: BRAND.navy }}>מרכיב מילים מהבחירות שלכם...</div>
           <WaveBar active count={16} height={28} />
           <div style={{ color: '#9ca3af', fontSize: 14 }}>מעבד את התשובות שלכם</div>
         </div>
@@ -110,7 +114,8 @@ export default function MagicSongPage() {
               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>
                 <WaveBar active count={18} height={28} />
               </div>
-              <div style={{ textAlign: 'center', color: BRAND.yellow, fontWeight: 900, fontSize: 16, marginBottom: 14 }}>✨ השיר שלכם ✨</div>
+              <div style={{ textAlign: 'center', color: BRAND.yellow, fontWeight: 900, fontSize: 16, marginBottom: 14 }}>✨ המילים שיצרתם ✨</div>
+              <p style={{color:'white',fontSize:12,textAlign:'center'}}>זו טיוטת מילים מהבחירות שלכם. לחן והפקת שיר מלא יתווספו בהמשך.</p>
               {song.map((line, i) => (
                 <motion.div key={i} initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.16, type: 'spring', stiffness: 180 }}
@@ -120,13 +125,14 @@ export default function MagicSongPage() {
                 </motion.div>
               ))}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 16 }}>
-                <Btn bg={saved ? BRAND.green : BRAND.pink} onClick={() => setSaved(true)} style={{ fontSize: 14, padding: '11px' }}>{saved ? '✓ נשמר' : '💾 שמור'}</Btn>
-                <Btn bg={BRAND.cyan} style={{ fontSize: 14, padding: '11px' }}>🎤 הקלט</Btn>
-                <Btn bg={BRAND.purple} style={{ fontSize: 14, padding: '11px' }}>📋 העתק</Btn>
-                <Btn bg={BRAND.orange} style={{ fontSize: 14, padding: '11px' }}>🔊 השמע</Btn>
+                <Btn bg={saved ? BRAND.green : BRAND.pink} onClick={() => { localStorage.setItem('habeat:magic-song', JSON.stringify(song)); setSaved(true) }} style={{ fontSize: 14, padding: '11px' }}>{saved ? '✓ נשמר' : '💾 שמור'}</Btn>
+                <Link href="/recording" style={{ textDecoration: 'none' }}><Btn bg={BRAND.cyan} style={{ fontSize: 14, padding: '11px', width: '100%' }}>🎤 להקלטה</Btn></Link>
+                <Btn bg={BRAND.purple} onClick={async () => { try { await navigator.clipboard.writeText(song.join('\n')); setNotice('השיר הועתק!') } catch { setNotice('לא ניתן להעתיק במכשיר הזה.') } }} style={{ fontSize: 14, padding: '11px' }}>📋 העתק</Btn>
+                <Btn bg={BRAND.orange} onClick={() => { if (!speakHebrew(song.join('. '))) setNotice('אין הקראה במכשיר הזה. נסו Chrome עם קול בעברית.') }} style={{ fontSize: 14, padding: '11px' }}>🔊 הקרא</Btn>
               </div>
             </Card>
           </motion.div>
+          {notice && <p role="status" className="text-sm text-center text-indigo-900">{notice}</p>}
           <Card>
             <div className="font-black" style={{ fontSize: 14, color: BRAND.navy, marginBottom: 10 }}>📝 בחירות שלכם</div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
@@ -242,7 +248,7 @@ export default function MagicSongPage() {
           <div style={{ flex: 1 }} />
           {qIdx === totalQ - 1 && (answers[qIdx] || (q.freeText && freeText)) && (
             <Btn bg={`linear-gradient(135deg,${BRAND.yellow},${BRAND.orange})`}
-              onClick={() => { if (q.freeText && freeText.trim()) submitFree(); setTimeout(generate, 100) }}
+              onClick={() => { if (q.freeText && freeText.trim()) submitFree(); generate(freeText.trim() || answers[qIdx]) }}
               style={{ color: BRAND.navy, padding: '11px 20px', fontSize: 15, fontWeight: 900 }}>✨ צרי שיר!</Btn>
           )}
         </div>

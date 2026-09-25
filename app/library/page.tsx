@@ -1,112 +1,73 @@
 'use client'
 
-import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { AppShell }   from '@/components/layout/AppShell'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { AppShell } from '@/components/layout/AppShell'
 import { BackHeader } from '@/components/layout/BackHeader'
-import { Card }       from '@/components/ui/Card'
-import { WaveBar }    from '@/components/ui/WaveBar'
-import { BRAND }      from '@/lib/constants'
-import { MOCK_SONGS } from '@/lib/mockData'
+import { BRAND } from '@/lib/constants'
+import { playMusic, stopMusic, speakHebrew, type DemoTrack } from '@/lib/audio'
 
-const TABS = [
-  { id: 'songs', label: '🎵 שירים', count: 6 },
-  { id: 'clips', label: '🎬 קליפים', count: 4 },
-  { id: 'mine',  label: '⭐ שלי',   count: 2 },
+type Track = { id: DemoTrack; title: string; emoji: string; duration: string; color: string; prompt: string }
+const tracks: Track[] = [
+  { id: 'garden-hello', title: 'בוקר של צלילים', emoji: '☀️', duration: 'כ־19 שניות', color: '#FFD600', prompt: 'בואו נקשיב, נמחא כפיים ונצטרף לקצב!' },
+  { id: 'rain-dance', title: 'טיפות רוקדות', emoji: '🌧️', duration: 'כ־24 שניות', color: '#00B4E6', prompt: 'איך נשמעות טיפות של גשם? בואו ננסה!' },
+  { id: 'color-parade', title: 'מצעד הצבעים', emoji: '🎨', duration: 'כ־16 שניות', color: '#FF4DA6', prompt: 'כל צבע מקבל צליל. בחרו צבע והצטרפו!' },
 ]
 
 export default function LibraryPage() {
-  const [tab,     setTab]     = useState('songs')
-  const [query,   setQuery]   = useState('')
-  const [playing, setPlaying] = useState<number | null>(null)
+  const [playing, setPlaying] = useState<DemoTrack | null>(null)
+  const [catalog, setCatalog] = useState<Track[]>(tracks)
+  const [catalogSource, setCatalogSource] = useState<'loading' | 'live' | 'fallback'>('loading')
+  const [message, setMessage] = useState('')
+  useEffect(() => {
+    const controller = new AbortController()
+    fetch('https://oqwzjhqzjfhdlploezad.supabase.co/rest/v1/song_catalog?select=id,title,emoji,color,builtin_audio_id,rights_status,published&published=eq.true&rights_status=eq.cleared&order=sort_order.asc', {
+      headers: { apikey: 'sb_publishable_fDE7XnJ7POVT_UkylwNDcA_Eh3jdPVG' }, signal: controller.signal,
+    }).then(async response => { if (!response.ok) throw new Error('catalog'); return response.json() })
+      .then((rows: { id: string; title: string; emoji: string; color: string; builtin_audio_id: string | null }[]) => {
+        const available = rows.filter(row => tracks.some(track => track.id === row.builtin_audio_id))
+          .map(row => ({ ...tracks.find(track => track.id === row.builtin_audio_id)!, title: row.title, emoji: row.emoji, color: row.color }))
+        if (available.length) { setCatalog(available); setCatalogSource('live') } else setCatalogSource('fallback')
+      }).catch(() => { if (!controller.signal.aborted) setCatalogSource('fallback') })
+    return () => controller.abort()
+  }, [])
+  useEffect(() => () => { stopMusic(); if ('speechSynthesis' in window) window.speechSynthesis.cancel() }, [])
 
-  const songs = MOCK_SONGS.filter(s =>
-    !query || s.title.includes(query) || s.artist.includes(query)
-  )
+  const toggle = async (id: DemoTrack) => {
+    if (playing === id) { stopMusic(); setPlaying(null); return }
+    try {
+      setMessage('')
+      setPlaying(id)
+      await playMusic(id, () => setPlaying(current => current === id ? null : current))
+    } catch {
+      setPlaying(null)
+      setMessage('לא הצלחנו להשמיע. בדקו שהצליל במכשיר פעיל ונסו שוב.')
+    }
+  }
 
-  return (
-    <AppShell bg="#f0fdf4">
-      <BackHeader title="ספריית שירים וקליפים 📂" bg={BRAND.green} />
-      <div className="p-4 space-y-3">
-
-        {/* Search */}
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
-          <input value={query} onChange={e => setQuery(e.target.value)}
-            placeholder="🔍 חיפוש שיר..."
-            style={{
-              width: '100%', padding: '14px 16px', borderRadius: 14,
-              border: '2px solid #e5e7eb', fontSize: 16,
-              fontFamily: 'inherit', outline: 'none', direction: 'rtl',
-              transition: 'border 0.2s', boxSizing: 'border-box',
-            }}
-            onFocus={e => (e.target.style.borderColor = BRAND.green)}
-            onBlur={e => (e.target.style.borderColor = '#e5e7eb')}
-          />
-        </motion.div>
-
-        {/* Tabs */}
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-          <div style={{ display: 'flex', gap: 8 }}>
-            {TABS.map(t => (
-              <button key={t.id} onClick={() => setTab(t.id)} style={{
-                flex: 1, padding: '11px 4px', borderRadius: 12, border: 'none',
-                background: tab === t.id ? BRAND.green : '#e5e7eb',
-                color: tab === t.id ? 'white' : '#6b7280',
-                fontWeight: 800, fontSize: 13, fontFamily: 'inherit',
-                cursor: 'pointer', transition: 'all 0.2s',
-              }}>{t.label} ({t.count})</button>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-          {songs.map((song, i) => (
-            <motion.div key={song.id}
-              initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.12 + i * 0.07 }}
-              whileTap={{ scale: 0.97 }}>
-              <Card style={{ padding: 12, cursor: 'pointer' }}
-                onClick={() => setPlaying(playing === song.id ? null : song.id)}>
-
-                {/* Thumbnail */}
-                <div style={{
-                  height: 80, borderRadius: 14, marginBottom: 10,
-                  background: `linear-gradient(135deg,${song.color}30,${song.color}10)`,
-                  border: `2px solid ${song.color}33`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  overflow: 'hidden',
-                }}>
-                  {playing === song.id
-                    ? <WaveBar active count={9} color={song.color} height={40} />
-                    : <span style={{ fontSize: 36 }}>{song.emoji}</span>
-                  }
-                </div>
-
-                <div className="font-black" style={{ fontSize: 14, color: BRAND.navy }}>{song.title}</div>
-                <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2, marginBottom: 8 }}>{song.artist}</div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: 11, color: '#9ca3af' }}>{song.duration}</span>
-                  <div style={{
-                    width: 30, height: 30, borderRadius: 9, background: song.color,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: 'white', fontSize: 13,
-                  }}>{playing === song.id ? '⏸' : '▶'}</div>
-                </div>
-              </Card>
-            </motion.div>
-          ))}
+  return <AppShell bg="#f0f9ff">
+    <BackHeader title="ספריית השירים 🎵" bg={BRAND.cyan} />
+    <div className="p-4 space-y-4" dir="rtl">
+      <Link href="/guide" className="inline-block text-sm font-bold text-indigo-800">🎬 צפו בהדרכת הספרייה</Link>
+      <p className="text-sm text-slate-700 font-semibold">בחרו קטע, הקשיבו לצלילים והצטרפו לקצב. אפשר לשמוע שוב כמה שרוצים.</p>
+      {catalogSource === 'fallback' && <p className="text-xs text-amber-900 bg-amber-50 rounded-xl p-2">אין כרגע חיבור לקטלוג. שלושת קטעי ההתנסות זמינים במכשיר.</p>}
+      {catalog.map(track => <section key={track.id} className="rounded-2xl bg-white shadow-sm border border-slate-100 p-4" aria-label={track.title}>
+        <div className="flex items-center gap-3">
+          <span className="text-4xl" aria-hidden="true">{track.emoji}</span>
+          <div className="flex-1"><h2 className="font-black text-lg" style={{color:BRAND.navy}}>{track.title}</h2><p className="text-xs text-slate-600">קטע אינסטרומנטלי מקורי · {track.duration}</p></div>
         </div>
-
-        {songs.length === 0 && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            style={{ textAlign: 'center', padding: '32px 0', color: '#9ca3af' }}>
-            <div style={{ fontSize: 40, marginBottom: 8 }}>🔍</div>
-            <div style={{ fontWeight: 700 }}>לא נמצאו שירים</div>
-          </motion.div>
-        )}
-
-      </div>
-    </AppShell>
-  )
+        <p className="my-3 text-sm text-slate-700">{track.prompt}</p>
+        <div className="flex gap-2">
+          <button type="button" onClick={() => toggle(track.id)} className="flex-1 rounded-xl px-3 py-3 font-bold text-white" style={{background: playing === track.id ? BRAND.navy : BRAND.purple}} aria-label={`${playing === track.id ? 'עצור' : 'נגן'} ${track.title}`}>
+            {playing === track.id ? '⏹ עצור' : '▶ השמיעו לי'}
+          </button>
+          <button type="button" onClick={() => { if (!speakHebrew(`${track.title}. ${track.prompt}`)) setMessage('אין הקראה במכשיר הזה. נסו בדפדפן Chrome עם קול בעברית.') }} className="rounded-xl px-3 py-3 font-bold border-2" style={{borderColor:track.color,color:BRAND.navy}} aria-label={`הקרא את ההסבר על ${track.title}`}>
+            🔊 הקראו לי
+          </button>
+        </div>
+      </section>)}
+      {message && <p role="alert" className="rounded-xl bg-rose-50 p-3 text-sm text-rose-900">{message}</p>}
+      <p className="text-xs text-slate-600">שירים מוכרים יצטרפו לספרייה לאחר הוספת שמע והסדרת זכויות.</p>
+    </div>
+  </AppShell>
 }
