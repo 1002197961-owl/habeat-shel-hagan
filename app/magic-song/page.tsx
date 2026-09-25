@@ -128,7 +128,7 @@ export default function MagicSongPage() {
                 <Btn bg={saved ? BRAND.green : BRAND.pink} onClick={() => { localStorage.setItem('habeat:magic-song', JSON.stringify(song)); setSaved(true) }} style={{ fontSize: 14, padding: '11px' }}>{saved ? '✓ נשמר' : '💾 שמור'}</Btn>
                 <Link href="/recording" style={{ textDecoration: 'none' }}><Btn bg={BRAND.cyan} style={{ fontSize: 14, padding: '11px', width: '100%' }}>🎤 להקלטה</Btn></Link>
                 <Btn bg={BRAND.purple} onClick={async () => { try { await navigator.clipboard.writeText(song.join('\n')); setNotice('השיר הועתק!') } catch { setNotice('לא ניתן להעתיק במכשיר הזה.') } }} style={{ fontSize: 14, padding: '11px' }}>📋 העתק</Btn>
-                <Btn bg={BRAND.orange} onClick={() => { if (!speakHebrew(song.join('. '))) setNotice('אין הקראה במכשיר הזה. נסו Chrome עם קול בעברית.') }} style={{ fontSize: 14, padding: '11px' }}>🔊 הקרא</Btn>
+                <Btn bg={BRAND.orange} onClick={() => { if (!speakHebrew(song.join('. '))) setNotice('לא נמצא קול עברי במכשיר. הפעילו קול עברי בהגדרות הדפדפן ונסו שוב.') }} style={{ fontSize: 14, padding: '11px' }}>🔊 הקרא</Btn>
               </div>
             </Card>
           </motion.div>

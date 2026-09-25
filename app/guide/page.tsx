@@ -31,7 +31,7 @@ export default function GuidePage() {
     <div className="space-y-4">{lessons[audience].map((lesson, index) => <section key={lesson.title} className="rounded-2xl bg-white p-4 shadow-sm">
       <h2 className="font-black text-lg">{index + 1}. {lesson.emoji} {lesson.title}</h2>
       <p className="text-sm mt-2 leading-relaxed">{lesson.text}</p>
-      <div className="mt-3 rounded-xl bg-indigo-50 p-3 text-sm text-indigo-800">🎞️ מקום לסרטון Vids. התסריט מוכן; הסרטון יופיע כאן לאחר הפקתו.</div>
+      {audience === 'teachers' && <div className="mt-3 rounded-xl bg-indigo-50 p-3 text-xs text-indigo-800">🎬 סרטון הדרכה קצר יתווסף כאן לאחר ההפקה.</div>}
       <Link href={lesson.href} className="inline-block mt-3 rounded-xl bg-indigo-800 text-white px-4 py-2 font-bold text-sm">נסו עכשיו ←</Link>
     </section>)}</div>
   </main>

@@ -61,12 +61,12 @@ export default function LibraryPage() {
           <button type="button" onClick={() => toggle(track.id)} className="flex-1 rounded-xl px-3 py-3 font-bold text-white" style={{background: playing === track.id ? BRAND.navy : BRAND.purple}} aria-label={`${playing === track.id ? 'עצור' : 'נגן'} ${track.title}`}>
             {playing === track.id ? '⏹ עצור' : '▶ השמיעו לי'}
           </button>
-          <button type="button" onClick={() => { if (!speakHebrew(`${track.title}. ${track.prompt}`)) setMessage('אין הקראה במכשיר הזה. נסו בדפדפן Chrome עם קול בעברית.') }} className="rounded-xl px-3 py-3 font-bold border-2" style={{borderColor:track.color,color:BRAND.navy}} aria-label={`הקרא את ההסבר על ${track.title}`}>
+          <button type="button" onClick={() => { stopMusic(); setPlaying(null); if (speakHebrew(`${track.title}. ${track.prompt}`, () => setMessage(''))) setMessage('🔊 מקריאים עכשיו'); else setMessage('לא נמצא קול עברי במכשיר. הפעילו קול עברי בהגדרות הדפדפן ונסו שוב.') }} className="rounded-xl px-3 py-3 font-bold border-2" style={{borderColor:track.color,color:BRAND.navy}} aria-label={`הקרא את ההסבר על ${track.title}`}>
             🔊 הקראו לי
           </button>
         </div>
       </section>)}
-      {message && <p role="alert" className="rounded-xl bg-rose-50 p-3 text-sm text-rose-900">{message}</p>}
+      {message && <p role="status" className="rounded-xl bg-indigo-50 p-3 text-sm text-indigo-900">{message}</p>}
       <p className="text-xs text-slate-600">שירים מוכרים יצטרפו לספרייה לאחר הוספת שמע והסדרת זכויות.</p>
     </div>
   </AppShell>

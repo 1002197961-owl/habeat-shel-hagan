@@ -54,8 +54,10 @@ export function speakHebrew(text: string, onDone?: () => void): boolean {
   utterance.rate = 0.86
   utterance.pitch = 1.04
   const voices = synthesis.getVoices()
-  utterance.voice = voices.find(v => v.lang.toLowerCase() === 'he-il')
-    ?? voices.find(v => v.lang.toLowerCase().startsWith('he')) ?? null
+  const hebrewVoice = voices.find(v => v.lang.toLowerCase() === 'he-il')
+    ?? voices.find(v => v.lang.toLowerCase().startsWith('he'))
+  if (!hebrewVoice) return false
+  utterance.voice = hebrewVoice
   utterance.onend = () => onDone?.()
   utterance.onerror = () => onDone?.()
   synthesis.speak(utterance)
