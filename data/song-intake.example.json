@@ -1,0 +1,19 @@
+{
+  "id": "replace-with-song-id",
+  "title": "שם השיר להשלמה",
+  "artist": "יוצרים ומבצעים להשלמה",
+  "category": "movement",
+  "difficulty": "easy",
+  "age_level": "3-6",
+  "bpm": 100,
+  "duration_sec": null,
+  "emoji": "🎵",
+  "color": "#00B4E6",
+  "pattern": ["red", "rest", "yellow", "rest"],
+  "description": "הנחיית פעילות להשלמה",
+  "audio_kind": "sung",
+  "rights_status": "pending",
+  "recording_status": "pending",
+  "published": false,
+  "sort_order": 100
+}

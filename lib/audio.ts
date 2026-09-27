@@ -6,11 +6,13 @@ const scores: Record<DemoTrack, { bpm: number; notes: number[]; wave: Oscillator
   'color-parade': { bpm: 120, notes: [261.63, 329.63, 392, 440, 523.25, 440, 392, 523.25], wave: 'triangle' },
 }
 
+let musicGeneration = 0
 let context: AudioContext | null = null
 let active: OscillatorNode[] = []
 let stopTimer: ReturnType<typeof setTimeout> | null = null
 
 export function stopMusic() {
+  musicGeneration++
   if (stopTimer) clearTimeout(stopTimer)
   stopTimer = null
   for (const oscillator of active) {
@@ -21,9 +23,11 @@ export function stopMusic() {
 
 export async function playMusic(track: DemoTrack, onDone: () => void) {
   stopMusic()
+  const request = musicGeneration
   const score = scores[track]
   context ??= new AudioContext()
   await context.resume()
+  if (request !== musicGeneration) return
   const beat = 60 / score.bpm
   const start = context.currentTime + 0.04
   const notes = [...score.notes, ...score.notes, ...score.notes, ...score.notes]
@@ -42,7 +46,7 @@ export async function playMusic(track: DemoTrack, onDone: () => void) {
     oscillator.stop(time + beat * 0.82)
     active.push(oscillator)
   })
-  stopTimer = setTimeout(() => { active = []; stopTimer = null; onDone() }, notes.length * beat * 1000)
+  stopTimer = setTimeout(() => { active = []; stopTimer = null; onDone() }, (notes.length * beat + 0.04) * 1000)
 }
 
 export function speakHebrew(text: string, onDone?: () => void): boolean {

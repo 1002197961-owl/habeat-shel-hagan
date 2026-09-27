@@ -1,0 +1,56 @@
+[
+  {
+    "viewport": {
+      "width": 1280,
+      "height": 900
+    },
+    "status": "PASS",
+    "type": "SOFTWARE FIXTURE ONLY",
+    "physicalHardwareTest": false,
+    "checks": [
+      "explicit permission gesture",
+      "raw data log",
+      "mapping",
+      "velocity-zero ignored",
+      "wrong note ignored",
+      "duplicate delivery",
+      "fast distinct event retained",
+      "one-action turn",
+      "two-action turn progresses only on second event",
+      "stop cancels second demo tone and turn timer",
+      "disconnect pauses",
+      "reconnect needs restart",
+      "JSON timing labels",
+      "simulation separation",
+      "RTL/mobile",
+      "navigation"
+    ]
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "status": "PASS",
+    "type": "SOFTWARE FIXTURE ONLY",
+    "physicalHardwareTest": false,
+    "checks": [
+      "explicit permission gesture",
+      "raw data log",
+      "mapping",
+      "velocity-zero ignored",
+      "wrong note ignored",
+      "duplicate delivery",
+      "fast distinct event retained",
+      "one-action turn",
+      "two-action turn progresses only on second event",
+      "stop cancels second demo tone and turn timer",
+      "disconnect pauses",
+      "reconnect needs restart",
+      "JSON timing labels",
+      "simulation separation",
+      "RTL/mobile",
+      "navigation"
+    ]
+  }
+]

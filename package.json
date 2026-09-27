@@ -4,24 +4,29 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "node scripts/build.mjs",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "node --test tests/*.test.mjs",
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "node scripts/test-browser.mjs",
+    "capture:screens": "node scripts/test-browser.mjs --capture-only"
   },
   "dependencies": {
+    "clsx": "^2.1.1",
+    "framer-motion": "^11.15.0",
+    "lucide-react": "^0.468.0",
     "next": "^15.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "framer-motion": "^11.15.0",
-    "zustand": "^5.0.0",
-    "lucide-react": "^0.468.0",
-    "clsx": "^2.1.1"
+    "zustand": "^5.0.0"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "autoprefixer": "^10.4.20",
+    "playwright": "1.62.1",
     "postcss": "^8",
     "tailwindcss": "^3.4.17",
     "typescript": "^5"
