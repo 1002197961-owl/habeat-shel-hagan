@@ -1,5 +1,23 @@
+export type BeatColor = 'pink' | 'yellow' | 'cyan' | 'green' | 'orange' | 'purple'
+
+export interface BeatColorInfo {
+  color: string; label: string; instrument: string
+}
+
+export const BEAT_COLORS: Record<BeatColor, BeatColorInfo> = {
+  pink:   { color: '#FF4DA6', label: 'גיטרה',  instrument: 'Pink Guitar' },
+  yellow: { color: '#FFD600', label: 'פסנתר',  instrument: 'Piano Mat' },
+  cyan:   { color: '#00B4E6', label: 'שירה',   instrument: 'Vocals' },
+  green:  { color: '#22C55E', label: 'מיקרופון', instrument: 'Mic' },
+  orange: { color: '#FFA500', label: 'תופים',  instrument: 'Drums' },
+  purple: { color: '#8B5CF6', label: 'טאבלט', instrument: 'Tablet' },
+}
+
+export type Difficulty = 'easy' | 'medium' | 'hard'
+
 export interface Song {
   id: number; title: string; artist: string; duration: string; emoji: string; color: string
+  difficulty?: Difficulty; pattern?: BeatColor[]
 }
 export interface Garden {
   id: number; name: string; city: string; kids: number; songs: number; clips: number; progress: number
@@ -13,12 +31,12 @@ export interface Clip {
 }
 
 export const MOCK_SONGS: Song[] = [
-  { id: 1, title: 'שיר הגשם',       artist: 'גן שושנים',  duration: '2:34', emoji: '🌧️', color: '#00B4E6' },
-  { id: 2, title: 'ריקוד הכוכבים',  artist: 'גן הדר',      duration: '1:58', emoji: '⭐', color: '#FFD600' },
-  { id: 3, title: 'הגיטרה הורודה',  artist: 'גן פרחים',    duration: '3:12', emoji: '🎸', color: '#FF4DA6' },
-  { id: 4, title: 'צבעי הקשת',      artist: 'גן תמר',      duration: '2:45', emoji: '🌈', color: '#FFA500' },
-  { id: 5, title: 'מסע הצלילים',    artist: 'גן עדן',       duration: '2:20', emoji: '🎵', color: '#8B5CF6' },
-  { id: 6, title: 'שיר הבוקר',     artist: 'גן שמש',       duration: '1:45', emoji: '☀️', color: '#22C55E' },
+  { id: 1, title: 'שיר הגשם',       artist: 'גן שושנים',  duration: '2:34', emoji: '🌧️', color: '#00B4E6', difficulty: 'easy',   pattern: ['cyan','pink','yellow','cyan','green'] },
+  { id: 2, title: 'ריקוד הכוכבים',  artist: 'גן הדר',      duration: '1:58', emoji: '⭐', color: '#FFD600', difficulty: 'medium', pattern: ['yellow','orange','yellow','pink','orange','cyan'] },
+  { id: 3, title: 'הגיטרה הורודה',  artist: 'גן פרחים',    duration: '3:12', emoji: '🎸', color: '#FF4DA6', difficulty: 'hard',   pattern: ['pink','purple','cyan','pink','yellow','purple','orange'] },
+  { id: 4, title: 'צבעי הקשת',      artist: 'גן תמר',      duration: '2:45', emoji: '🌈', color: '#FFA500', difficulty: 'easy',   pattern: ['orange','green','cyan','yellow'] },
+  { id: 5, title: 'מסע הצלילים',    artist: 'גן עדן',       duration: '2:20', emoji: '🎵', color: '#8B5CF6', difficulty: 'medium', pattern: ['purple','cyan','pink','green','purple'] },
+  { id: 6, title: 'שיר הבוקר',     artist: 'גן שמש',       duration: '1:45', emoji: '☀️', color: '#22C55E', difficulty: 'easy',   pattern: ['green','yellow','green','cyan'] },
 ]
 
 export const MOCK_GARDENS: Garden[] = [
