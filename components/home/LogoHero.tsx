@@ -87,22 +87,21 @@ export function LogoHero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.28, duration: 0.4 }}
         >
-          <span
-            className="block font-black leading-none"
+          {/* Brand logo — approved asset: brand-sheet.png, logo lockup area (top-left) */}
+          <div
             style={{
-              color: BRAND.pink,
-              fontSize: 64,
-              textShadow: `0 0 32px ${BRAND.pink}66, 0 0 64px ${BRAND.pink}33`,
+              width: 260,
+              height: 185,
+              backgroundImage: "url('/brand-sheet.png')",
+              backgroundSize: '650px auto',
+              backgroundPosition: '0px 0px',
+              backgroundRepeat: 'no-repeat',
+              borderRadius: 12,
+              margin: '0 auto',
             }}
-          >
-            הביט
-          </span>
-          <span
-            className="block font-extrabold text-white"
-            style={{ fontSize: 36, marginTop: 2, letterSpacing: '-0.01em' }}
-          >
-            של הגן
-          </span>
+            role="img"
+            aria-label="הביט של הגן — לוגו"
+          />
         </motion.div>
 
         <motion.div
