@@ -166,9 +166,9 @@ export default function TurnTakingPage() {
     recorder.current.resetFingerprints(); setObserved(''); setNotes('')
   }
   return <main dir="rtl" className="min-h-screen p-4 space-y-4 bg-sky-50" style={{ color: BRAND.navy }}>
-    <Link href="/teacher" onClick={() => { stop(); controller.current?.disconnect() }} className="inline-block py-2 font-bold">חזרה למצב גננת</Link>
+    <Link href="/" onClick={() => { stop(); controller.current?.disconnect() }} className="inline-block py-2 font-bold">→ חזרה לבית</Link>
     <h1 className="text-2xl font-black">התור שלי, התור שלך</h1>
-    <p className="text-sm rounded-xl bg-white p-3">{mode === 'simulation' ? 'מצב הדמיה לפיתוח — אינו הוכחת חיבור לכלי.' : 'בדיקת קלט מכלי — חיבור פיזי טרם אומת. כניסת MIDI עשויה להיות גם תוכנה.'}</p>
+    
     <section aria-label="משחק תורות" className="rounded-3xl bg-white p-5 text-center space-y-4 shadow-sm">
       <p className="text-2xl font-black min-h-16" role="status" data-turn={turn}>{turn === 'waiting' && targetActions === 2 ? 'התור שלך — נגנו פעמיים' : labels[turn]}</p>
       <p>{targetActions === 1 ? 'מקשיבים לצליל אחד, ואז מנגנים פעם אחת.' : 'מקשיבים לשני צלילים, ואז מנגנים פעמיים.'}</p>
@@ -179,44 +179,9 @@ export default function TurnTakingPage() {
         <button onClick={() => stop()} className="rounded-xl p-3 bg-slate-100 font-bold">עצירה</button>
         <button onClick={() => stop('ready')} className="rounded-xl p-3 bg-slate-100 font-bold">חזרה להתחלה</button>
       </div>
-      {mode === 'simulation' && <button onClick={() => handle.current('simulation', SIM_PORT, [144, 60, 100], performance.now())} className="rounded-xl p-4 w-full font-bold" style={{ background: BRAND.yellow }}>פעולת הדמיה</button>}
-      {!ready && <p className="text-sm">מבוגר יחבר את הכלי ויבחר פעולה לפני שמתחילים.</p>}
+      
+      {!ready && <p className="text-sm">המשחק מוכן לבדיקה ללא חיבור כלי. הפעילות עם כלי פיזי תתווסף לאחר אימותה.</p>}
       {error && <p role="alert" className="text-sm font-bold">{error}</p>}
     </section>
-    <details className="rounded-2xl bg-white p-4" open>
-      <summary className="font-black cursor-pointer py-2">למבוגר: אבחון חיבור</summary>
-      <div className="space-y-3 mt-3 text-sm">
-        <p className="text-xs">גרסת בדיקה: <span dir="ltr">{process.env.NEXT_PUBLIC_BUILD_SHA || 'local-development'}</span></p>
-        <label className="block">מקור קלט <select value={mode} onChange={e => switchMode(e.target.value as InputEvent['source'])} className="w-full p-3 border rounded-xl"><option value="web-midi">כניסת Web MIDI</option><option value="simulation">הדמיה לפיתוח בלבד</option></select></label>
-        <p>{capability}</p>
-        <label className="block">רמת הסבב <select value={targetActions} onChange={e => { stop('ready'); const next = Number(e.target.value); state.current.targetActions = next; setTargetActions(next) }} className="w-full p-3 border rounded-xl"><option value="1">פעולה אחת</option><option value="2">שתי פעולות</option></select></label>
-        <p>קליטת נגינה והשלמת מספר הפעולות מתועדות בנפרד. דיוק בקצב עדיין אינו נמדד.</p>
-        {mode === 'web-midi' && <>
-          <div className="flex gap-2 flex-wrap"><button disabled={busy} onClick={connect} className="bg-indigo-100 p-3 rounded-xl font-bold">בדקו כניסות קלט</button><button onClick={() => { stop(); controller.current?.disconnect(); setPorts([]) }} className="bg-slate-100 p-3 rounded-xl">נתקו קלט</button></div>
-          <p>{ports.length ? `כניסות שנמצאו: ${ports.map(p => `${p.name} (${p.manufacturer || 'יצרן לא דווח'})`).join(', ')}` : 'לא נמצאה כניסה מחוברת.'}</p>
-          <p>נגנו פעולה אחת ובדקו ביומן אילו הודעות נוצרו. בחרו את ה־Note On האחרון רק לאחר זיהוי הפעולה. אין כאן זיהוי אוטומטי של פריטה.</p>
-          <button disabled={!latestNote} onClick={learn} className="bg-indigo-100 p-3 rounded-xl disabled:opacity-40">מפו את התו האחרון למשחק</button>
-          <p data-mapping>{mapping ? `מיפוי: ערוץ ${mapping.channel}, תו ${mapping.note}` : 'לא נבחר מיפוי.'}</p>
-        </>}
-        <p>צליל הבדיקה הוא צליל מקורי מהתרגיל הקיים. סגרו יישום נוסף שמנגן את אותו קלט כדי למנוע צליל כפול. התחילו משלוש פעולות מופרדות.</p>
-        <label className="block">כלי, גרסת קושחה, כבל ומתאם<input value={equipment} onChange={e => setEquipment(e.target.value)} className="border rounded-xl w-full p-3" /></label>
-        <label className="block">דגם מכשיר היעד ומערכת ההפעלה<input value={target} onChange={e => setTarget(e.target.value)} className="border rounded-xl w-full p-3" /></label>
-        <label className="block">מספר פעולות פיזיות שספר המבוגר<input type="number" min="0" step="1" value={observed} onChange={e => setObserved(e.target.value)} className="border rounded-xl w-full p-3" /></label>
-        <label className="block">ממצאים ותיעוד וידאו, אם קיים<textarea value={notes} onChange={e => setNotes(e.target.value)} className="border rounded-xl w-full p-3" /></label>
-        <p>הודעות: {total.current} · תווים ממופים: {totalMatched.current} · תגובות במשחק: {totalAccepted.current} · מסירות זהות שסוננו: {totalDuplicate.current}</p>
-        <p>תגובות לנגינה: {feedbackResponses.current} · סבבים שהושלמו: {completedRounds.current} · דיוק בקצב: לא נבדק</p>
-        <p>זמן קבלת הודעה בדפדפן אינו זמן הפעולה בכלי. המדידה הפנימית אינה מודדת השהיה פיזית עד צליל או מסך. אי־קליטה נבדקת מול ספירת פעולות או וידאו, לא מתוך היומן בלבד.</p>
-        <div className="flex gap-2 flex-wrap"><button onClick={exportReport} className="bg-indigo-100 p-3 rounded-xl font-bold">הורידו דוח JSON</button><button onClick={clear} className="bg-slate-100 p-3 rounded-xl">התחילו מדידה חדשה</button></div>
-        <p>מוצגות 30 ההודעות האחרונות; עד 1,000 נשמרות בדוח. האירועים נשמרים במפגש בלבד.</p>
-        <ol className="space-y-2" aria-label="יומן קלט">{rows.slice(0, 30).map(row => <li key={row.id} className="border rounded-xl p-2 break-words text-xs" data-event-id={row.id}>
-          <strong>#{row.id} · {row.source === 'simulation' ? 'הדמיה' : row.port.name} · {reasons[row.decision]}</strong>
-          <div dir="ltr">{row.receivedAt}</div>
-          <div dir="ltr" className="font-mono">{row.bytes.map(b => b.toString(16).padStart(2, '0')).join(' ')} · {row.kind}</div>
-          <div>ערוץ {row.channel ?? '—'} · תו {row.note ?? '—'} · עוצמה {row.velocity ?? '—'}</div>
-          <div>תגובת נגינה: {row.feedback ? 'כן' : 'לא'} · סבב: {row.taskOutcome === 'completed' ? 'הושלם' : row.taskOutcome === 'in-progress' ? 'בתהליך' : 'לא נספר'}</div>
-          {row.uiCommitMs !== undefined && <div>קבלה עד עדכון DOM: {row.uiCommitMs.toFixed(1)} ms</div>}
-        </li>)}</ol>
-      </div>
-    </details>
   </main>
 }
