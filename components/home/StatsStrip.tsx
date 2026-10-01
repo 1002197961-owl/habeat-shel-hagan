@@ -4,12 +4,10 @@ import { motion } from 'framer-motion'
 import { BRAND } from '@/lib/constants'
 
 const STATS = [
-  { value: '4',  label: 'גנים', emoji: '🏫', color: BRAND.cyan },
-  { value: '92', label: 'ילדים', emoji: '👧', color: BRAND.pink },
-  { value: '28', label: 'שירים', emoji: '🎵', color: BRAND.yellow },
-  { value: '9',  label: 'קליפים', emoji: '🎬', color: BRAND.purple },
+  { value: '3', label: 'קטעי נגינה', emoji: '🎵', color: BRAND.yellow },
+  { value: '✨', label: 'שיר הקסם', emoji: '⭐', color: BRAND.pink },
+  { value: '🎙️', label: 'אולפן', emoji: '🎬', color: BRAND.cyan },
 ]
-
 export function StatsStrip() {
   return (
     <motion.div

@@ -70,7 +70,7 @@ export function LogoHero() {
           transition={{ duration: 1.6, repeat: Infinity }}
         />
         <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em' }}>
-          פעיל עכשיו · 4 גנים
+          גרסת התנסות · בואו ליצור מוזיקה
         </span>
       </motion.div>
 

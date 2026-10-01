@@ -1,4 +1,5 @@
 'use client'
+import Link from 'next/link'
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -49,7 +50,10 @@ export default function TeacherPage() {
   return (
     <AppShell bg="#fff1f5">
       <BackHeader title="מצב גננת 👩‍🏫" bg={BRAND.rose} />
+      <div className="px-4 pt-3"><Link href="/guide?audience=teachers" className="inline-block rounded-xl bg-white px-3 py-2 text-sm font-bold text-indigo-800 shadow-sm">🎬 הדרכת גננות</Link></div>
       <div className="p-4 space-y-3">
+        <Link href="/turn-taking" className="block rounded-xl bg-white p-3 font-bold text-indigo-800 shadow-sm">התור שלי, התור שלך — בדיקת חיבור כלי</Link>
+        <p className="rounded-xl bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-950">גרסת הדגמה: נתוני הילדים והתחנות במסך זה להמחשה בלבד.</p>
 
         {/* Teacher profile */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
