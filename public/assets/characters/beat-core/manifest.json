@@ -1,0 +1,25 @@
+{
+  "status": "LOCKED_SOURCE_GEOMETRY_ONLY",
+  "files": [
+    {
+      "file": "BeatCore_R.svg",
+      "sha256": "835a8c1a39b0f49983ba8577f0a007dc89b028881525280323b3402d42463013"
+    },
+    {
+      "file": "BeatCore_G.svg",
+      "sha256": "5753ed0af6b175d3e3c65c4008ea07c05bbb309ab8828d4215c9cb8640532018"
+    },
+    {
+      "file": "BeatCore_V.svg",
+      "sha256": "5b283c05446390f3b65148fbc4c919c291c0bc98a2ce3d2d68469cf5d65e2723"
+    },
+    {
+      "file": "BeatCore_M.svg",
+      "sha256": "4c1c3775729942fbd6ca6db86f7bde289c07fa061155ae2562b67f8f4922d00f"
+    },
+    {
+      "file": "BeatCore_LOCKED.css",
+      "sha256": "92f333164ccb1c4f0868d32f63993b27d0812c9f06c8f8fa349285e885f126d0"
+    }
+  ]
+}

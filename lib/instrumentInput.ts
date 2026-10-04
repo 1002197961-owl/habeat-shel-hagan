@@ -67,6 +67,7 @@ export class MidiTransport {
   private generation = 0
   private access: MidiAccessLike | null = null
   private bound = new Map<MidiPortLike, (event: MidiMessage) => void>()
+  private opened = new Set<MidiPortLike>()
   constructor(private onMessage: (port: InputPort, bytes: number[], timeStamp: number) => void,
     private onPorts: (ports: InputPort[]) => void, private onError: (message: string) => void) {}
   async connect(request: () => Promise<MidiAccessLike>) {
@@ -84,25 +85,35 @@ export class MidiTransport {
     if (!this.access) return
     const ports = [...this.access.inputs.values()].filter(p => p.state === 'connected')
     for (const [port, handler] of this.bound) if (!ports.includes(port)) {
-      port.removeEventListener('midimessage', handler); this.bound.delete(port)
+      port.removeEventListener('midimessage', handler); this.bound.delete(port); this.opened.delete(port)
     }
     for (const port of ports) if (!this.bound.has(port)) {
       const generation = this.generation
       const handler = (event: MidiMessage) => {
-        if (generation === this.generation && this.bound.has(port) && port.state === 'connected')
+        if (generation === this.generation && this.opened.has(port) && this.bound.has(port) && port.state === 'connected')
           this.onMessage({ id: port.id, name: port.name || 'כניסת MIDI ללא שם', manufacturer: port.manufacturer || '', state: port.state },
             Array.from(event.data ?? []), event.timeStamp)
       }
       this.bound.set(port, handler); port.addEventListener('midimessage', handler)
-      void port.open().catch(() => { if (generation === this.generation) this.onError('לא ניתן לפתוח את כניסת הקלט.') })
+      void port.open().then(() => {
+        if (generation !== this.generation || this.bound.get(port) !== handler || port.state !== 'connected') return
+        this.opened.add(port); this.publishPorts()
+      }).catch(() => {
+        if (generation !== this.generation || this.bound.get(port) !== handler) return
+        port.removeEventListener('midimessage', handler); this.bound.delete(port); this.opened.delete(port)
+        this.publishPorts(); this.onError('לא ניתן לפתוח את כניסת הקלט. בדקו את החיבור ונסו שוב.')
+      })
     }
-    this.onPorts(ports.map(p => ({ id: p.id, name: p.name || 'כניסת MIDI ללא שם', manufacturer: p.manufacturer || '', state: p.state })))
+    this.publishPorts()
+  }
+  private publishPorts() {
+    this.onPorts([...this.opened].filter(p => p.state === 'connected').map(p => ({ id: p.id, name: p.name || 'כניסת MIDI ללא שם', manufacturer: p.manufacturer || '', state: p.state })))
   }
   disconnect() {
     this.generation++
     this.access?.removeEventListener('statechange', this.reconcile)
     this.access = null
-    const bound = [...this.bound]; this.bound.clear()
+    const bound = [...this.bound]; this.bound.clear(); this.opened.clear()
     for (const [port, handler] of bound) {
       port.removeEventListener('midimessage', handler); void port.close().catch(() => {})
     }

@@ -53,7 +53,7 @@ test('transport avoids listener duplication and cleans disconnect/reconnect/unmo
  assert.equal(messages.length,1);assert.equal(p.opens,1)
  p.state='disconnected';access.change();p.send();assert.equal(messages.length,1)
  assert.deepEqual(states.at(-1),[])
- p.state='connected';access.change();p.send();assert.equal(messages.length,2)
+ p.state='connected';access.change();await Promise.resolve();p.send();assert.equal(messages.length,2)
  transport.disconnect();p.send();access.change();assert.equal(messages.length,2);assert.equal(p.closes,1)
  assert.deepEqual(errors,[])
 })
@@ -68,4 +68,23 @@ test('permission denial reports failure and a retry succeeds',async()=>{
  const transport=new MidiTransport(()=>{},()=>{},e=>errors.push(e))
  await transport.connect(async()=>{throw new Error('denied')});assert.equal(errors.length,1)
  await transport.connect(async()=>access);assert.equal(p.opens,1);transport.disconnect()
+})
+
+test('failed port open is not reported ready and cannot feed the game',async()=>{
+ const p=new Port(),access=new Access();access.inputs.set(p.id,p)
+ p.open=()=>Promise.reject(new Error('device unavailable'))
+ const messages=[],states=[],errors=[]
+ const transport=new MidiTransport(e=>messages.push(e),p=>states.push(p),e=>errors.push(e))
+ await transport.connect(async()=>access);await Promise.resolve();p.send()
+ assert.deepEqual(states.at(-1),[]);assert.equal(errors.length,1);assert.equal(messages.length,0)
+ p.open=()=>Promise.resolve();await transport.connect(async()=>access);p.send()
+ assert.equal(states.at(-1).length,1);assert.equal(messages.length,1);transport.disconnect()
+})
+test('a port that finishes opening after disconnect stays inactive',async()=>{
+ let opened;const p=new Port(),access=new Access();access.inputs.set(p.id,p)
+ p.open=()=>new Promise(resolve=>{opened=resolve})
+ const states=[],messages=[];const transport=new MidiTransport(e=>messages.push(e),p=>states.push(p),()=>{})
+ await transport.connect(async()=>access);assert.deepEqual(states.at(-1),[])
+ transport.disconnect();opened();await Promise.resolve();p.send()
+ assert.deepEqual(states.at(-1),[]);assert.equal(messages.length,0)
 })

@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { PilotIcon } from '@/components/ui/PilotIcon'
 
 interface BackHeaderProps {
   title: string
@@ -28,7 +29,7 @@ export function BackHeader({
         className="flex items-center justify-center w-9 h-9 rounded-[10px] text-white text-lg flex-shrink-0 no-underline"
         style={{ background: 'rgba(255,255,255,0.25)' }}
       >
-        ←
+        <PilotIcon name="back" size={28} />
       </Link>
       <span className="text-white text-xl font-extrabold leading-none">
         {title}

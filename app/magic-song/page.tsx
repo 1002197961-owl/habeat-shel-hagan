@@ -13,6 +13,8 @@ import Link from 'next/link'
 import { useNarration } from '@/hooks/useNarration'
 import { NarrationReader } from '@/components/audio/NarrationReader'
 import { NARRATION } from '@/lib/narrationCatalog'
+import { MagicSongPlayer, type MagicSongPlayerHandle } from '@/components/audio/MagicSongPlayer'
+import { PilotIcon } from '@/components/ui/PilotIcon'
 
 const QUESTIONS = [
   { q: 'על מה יהיה השיר?', emoji: '🎵', hint: 'בחרו נושא',
@@ -66,6 +68,7 @@ export default function MagicSongPage() {
   const [notice, setNotice] = useState('')
 
   const narration = useNarration()
+  const songPlayer = useRef<MagicSongPlayerHandle | null>(null)
   const transitionTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const generatingTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const selectedRef = useRef(false)
@@ -150,7 +153,7 @@ export default function MagicSongPage() {
                 <WaveBar active={false} count={18} height={28} />
               </div>
               <div style={{ textAlign: 'center', color: BRAND.yellow, fontWeight: 900, fontSize: 16, marginBottom: 14 }}>✨ המילים שיצרתם ✨</div>
-              <p style={{color:'white',fontSize:12,textAlign:'center'}}>זו טיוטת מילים מהבחירות שלכם. עדיין אין לתוצר לחן או הקלטת שירה.</p>
+              <p style={{color:'white',fontSize:12,textAlign:'center'}}>זו טיוטת מילים מהבחירות שלכם. אפשר לנסות לשיר עם ליווי, או להקריא את המילים.</p>
               {song.map((line, i) => (
                 <motion.div key={i} initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.16, type: 'spring', stiffness: 180 }}
@@ -159,13 +162,14 @@ export default function MagicSongPage() {
                   {line}
                 </motion.div>
               ))}
+              <MagicSongPlayer ref={songPlayer} answers={answers} lines={song} beforePlay={() => { narration.reset(); stopSpeech() }} />
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 16 }}>
                 <Btn bg={saved ? BRAND.green : BRAND.pink} onClick={() => { localStorage.setItem('habeat:magic-song', JSON.stringify(song)); setSaved(true) }} style={{ fontSize: 14, padding: '11px' }}>{saved ? '✓ נשמר' : '💾 שמור'}</Btn>
                 <Link href="/recording" style={{ textDecoration: 'none' }}><Btn bg={BRAND.cyan} style={{ fontSize: 14, padding: '11px', width: '100%' }}>🎤 להקלטה</Btn></Link>
                 <Btn bg={BRAND.purple} onClick={async () => { try { await navigator.clipboard.writeText(song.join('\n')); setNotice('המילים הועתקו!') } catch { setNotice('לא ניתן להעתיק במכשיר הזה.') } }} style={{ fontSize: 14, padding: '11px' }}>📋 העתק</Btn>
-                <Btn bg={BRAND.orange} onClick={() => { narration.reset(); if (!speakHebrew(song.join('. '))) setNotice('לא נמצא קול עברי במכשיר. הפעילו קול עברי בהגדרות הדפדפן ונסו שוב.') }} style={{ fontSize: 14, padding: '11px' }}>🔊 הקראת המילים</Btn>
+                <Btn bg={BRAND.orange} onClick={() => { songPlayer.current?.reset(); narration.reset(); if (!speakHebrew(song.join('. '))) setNotice('לא נמצא קול עברי במכשיר. הפעילו קול עברי בהגדרות הדפדפן ונסו שוב.') }} style={{ fontSize: 14, padding: '11px' }}><PilotIcon name="hear-again" /> הקראת המילים</Btn>
               </div>
-              <button type="button" onClick={stopSpeech} className="mt-3 w-full rounded-xl border border-white/50 px-3 py-3 font-bold text-white">עצירת הקראת המילים</button>
+              <button type="button" onClick={stopSpeech} className="mt-3 w-full rounded-xl border border-white/50 px-3 py-3 font-bold text-white"><PilotIcon name="stop" /> עצירת הקראת המילים</button>
             </Card>
           </motion.div>
           {notice && <p role="status" className="text-sm text-center text-indigo-900">{notice}</p>}
@@ -178,7 +182,7 @@ export default function MagicSongPage() {
               ))}
             </div>
           </Card>
-          <Btn full bg="#f3f4f6" onClick={reset} style={{ color: '#6b7280', padding: '13px', fontSize: 15 }}>🔄 צרו מילים לשיר חדש</Btn>
+          <Btn full bg="#f3f4f6" onClick={reset} style={{ color: '#6b7280', padding: '13px', fontSize: 15 }}><PilotIcon name="try-again" /> צרו מילים לשיר חדש</Btn>
         </div>
       </AppShell>
     )
@@ -205,7 +209,7 @@ export default function MagicSongPage() {
             <Card style={{ textAlign: 'center', padding: '22px 18px', background: `linear-gradient(135deg,${BRAND.yellow}33,${BRAND.orange}18)` }}>
               <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 2, repeat: Infinity }} style={{ fontSize: 52, marginBottom: 10 }}>{q.emoji}</motion.div>
               <div className="font-black" style={{ fontSize: 20, color: BRAND.navy, marginBottom: 4 }}>{q.q}</div>
-              <div style={{ fontSize: 13, color: '#6b7280' }}>{q.hint}</div>
+              <div style={{ fontSize: 13, color: '#6b7280' }}><PilotIcon name="hint" size={22} /> {q.hint}</div>
               <NarrationReader key={qIdx} asset={NARRATION[`question-${qIdx + 1}`]} player={narration} label={`שאלה ${qIdx + 1}`} beforePlay={stopSpeech}/>
             </Card>
           </motion.div>
@@ -227,7 +231,7 @@ export default function MagicSongPage() {
                     boxSizing: 'border-box', marginBottom: 12, transition: 'border 0.2s' }} />
                 <Btn full bg={freeText.trim() ? `linear-gradient(135deg,${BRAND.yellow},${BRAND.orange})` : '#e5e7eb'}
                   onClick={submitFree} disabled={!freeText.trim()}
-                  style={{ padding: '13px', fontSize: 16, color: freeText.trim() ? BRAND.navy : '#9ca3af' }}>✓ אישור</Btn>
+                  style={{ padding: '13px', fontSize: 16, color: freeText.trim() ? BRAND.navy : '#9ca3af' }}><PilotIcon name="confirm" /> אישור</Btn>
               </Card>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -281,13 +285,13 @@ export default function MagicSongPage() {
         {notice && <p role="status" className="text-sm text-center text-indigo-900">{notice}</p>}
         <div style={{ display: 'flex', gap: 10 }}>
           {qIdx > 0 && (
-            <Btn bg="#f3f4f6" onClick={goBack} style={{ color: '#6b7280', padding: '11px 20px', fontSize: 14 }}>← אחורה</Btn>
+            <Btn bg="#f3f4f6" onClick={goBack} style={{ color: '#6b7280', padding: '11px 20px', fontSize: 14 }}><PilotIcon name="previous" /> אחורה</Btn>
           )}
           <div style={{ flex: 1 }} />
           {qIdx === totalQ - 1 && (answers[qIdx] || (q.freeText && freeText)) && (
             <Btn bg={`linear-gradient(135deg,${BRAND.yellow},${BRAND.orange})`}
               onClick={() => { if (q.freeText && freeText.trim()) submitFree(); generate(freeText.trim() || answers[qIdx]) }}
-              style={{ color: BRAND.navy, padding: '11px 20px', fontSize: 15, fontWeight: 900 }}>✨ צרו מילים לשיר!</Btn>
+              style={{ color: BRAND.navy, padding: '11px 20px', fontSize: 15, fontWeight: 900 }}><PilotIcon name="next" /> צרו מילים לשיר!</Btn>
           )}
         </div>
       </div>

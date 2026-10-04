@@ -4,6 +4,10 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { BRAND } from '@/lib/constants'
 import { InputRecorder, MidiTransport, routeInput, type InputEvent, type InputPort, type Mapping, type MidiAccessLike, type Turn } from '@/lib/instrumentInput'
 import { TurnTone } from '@/lib/turnTone'
+import { BeatCore } from '@/components/characters/BeatCore'
+import { beatCoreStateForTurn } from '@/lib/beatCore'
+import { PilotIcon } from '@/components/ui/PilotIcon'
+import { StaticCharacter } from '@/components/characters/StaticCharacter'
 
 type Row = InputEvent & { decision: string; accepted: boolean; feedback: boolean; taskOutcome: 'not-counted' | 'in-progress' | 'completed'; uiCommitMs?: number; audioScheduledMs?: number }
 const SIM_PORT: InputPort = { id: 'simulation', name: 'הדמיית פיתוח', manufacturer: '', state: 'connected' }
@@ -21,12 +25,15 @@ export default function TurnTakingPage() {
   const [error, setError] = useState('')
   const [capability, setCapability] = useState('טרם נבדק')
   const [busy, setBusy] = useState(false)
+  const [setupOpen, setSetupOpen] = useState(false)
+  const [captureSince, setCaptureSince] = useState(0)
   const [lastAccepted, setLastAccepted] = useState<number | null>(null)
+  const [lastGameEventId, setLastGameEventId] = useState<number | null>(null)
   const [targetActions, setTargetActions] = useState(1)
   const [actionsInTurn, setActionsInTurn] = useState(0)
   const [lastAction, setLastAction] = useState('')
-  const [equipment, setEquipment] = useState('')
-  const [target, setTarget] = useState('')
+  const [equipment, setEquipment] = useState('SENOSEN — יש להשלים דגם וכבל')
+  const [target, setTarget] = useState('טאבלט Android / Chrome — יש להשלים דגם וגרסה')
   const [observed, setObserved] = useState('')
   const [notes, setNotes] = useState('')
   const controller = useRef<MidiTransport | null>(null)
@@ -49,6 +56,7 @@ export default function TurnTakingPage() {
     tone.current?.stop()
     state.current.turn = next; setTurn(next); setBusy(false)
     state.current.actionsInTurn = 0; setActionsInTurn(0)
+    setLastGameEventId(null)
     setLastAction('')
   }
   const handle = useRef((source: InputEvent['source'], port: InputPort, bytes: number[], stamp: number) => {})
@@ -76,6 +84,7 @@ export default function TurnTakingPage() {
       row.taskOutcome = decision.next === 'responded' ? 'completed' : 'in-progress'
       if (row.taskOutcome === 'completed') completedRounds.current++
       totalAccepted.current++
+      setLastGameEventId(event.id)
     }
     rowsRef.current = [row, ...rowsRef.current].slice(0, 1000)
     setRows(rowsRef.current)
@@ -90,14 +99,13 @@ export default function TurnTakingPage() {
     setCapability(window.isSecureContext && 'requestMIDIAccess' in navigator && typeof navigator.requestMIDIAccess === 'function' ? 'Web MIDI זמין לבקשת הרשאה' : 'Web MIDI אינו זמין כאן')
     tone.current = new TurnTone()
     controller.current = new MidiTransport((port, data, stamp) => handle.current('web-midi', port, data, stamp), next => {
-      recorder.current.resetFingerprints()
       setPorts(next)
       setConnections(previous => [{ at: new Date().toISOString(), ports: next }, ...previous].slice(0, 100))
       if (state.current.mode === 'web-midi' && state.current.mapping && !next.some(p => p.id === state.current.mapping!.portId)) {
-        stop(); setError('הכלי נותק. חברו מחדש והתחילו סבב חדש כשאתם מוכנים.')
+        stop(); setCaptureSince(performance.now()); setError('הכלי נותק. חברו מחדש והתחילו סבב חדש כשאתם מוכנים.')
       }
     }, setError)
-    const leave = () => { stop(); controller.current?.disconnect(); setPorts([]) }
+    const leave = () => { stop(); controller.current?.disconnect(); setPorts([]); setCaptureSince(performance.now()) }
     const hidden = () => { if (document.hidden) leave() }
     window.addEventListener('pagehide', leave); document.addEventListener('visibilitychange', hidden)
     return () => {
@@ -108,7 +116,8 @@ export default function TurnTakingPage() {
     }
   }, [])
   const connect = async () => {
-    stop('ready'); setError(''); setBusy(true)
+    stop('ready'); setError(''); setBusy(true); setPorts([]); setMapping(null)
+    state.current.mapping = null; recorder.current.resetFingerprints(); setCaptureSince(performance.now())
     const request = (navigator as Navigator & { requestMIDIAccess?: (options: { sysex: boolean }) => Promise<MidiAccessLike> }).requestMIDIAccess
     if (!window.isSecureContext || !request) { setError('ממשק Web MIDI אינו זמין בדפדפן הזה. אין כרגע חיבור לכלי.'); setBusy(false); return }
     await controller.current?.connect(() => request.call(navigator, { sysex: false }))
@@ -134,11 +143,11 @@ export default function TurnTakingPage() {
     } catch { if (request === generation.current) { setBusy(false); setError('לא ניתן להפעיל שמע. בדקו עוצמה והרשאה ונסו שוב.') } }
   }
   const switchMode = (next: InputEvent['source']) => {
-    stop('ready'); controller.current?.disconnect(); setPorts([]); setMapping(null)
+    stop('ready'); controller.current?.disconnect(); setPorts([]); setMapping(null); setCaptureSince(performance.now())
     state.current.mode = next; state.current.mapping = null
     setMode(next); setError('')
   }
-  const latestNote = rows.find(r => r.source === 'web-midi' && r.kind === 'note-on' && !r.duplicate && ports.some(p => p.id === r.port.id))
+  const latestNote = rows.find(r => r.source === 'web-midi' && r.receivedMs >= captureSince && r.kind === 'note-on' && !r.duplicate && ports.some(p => p.id === r.port.id))
   const learn = () => {
     if (!latestNote || latestNote.channel === null || latestNote.note === null) return
     stop('ready'); const next = { portId: latestNote.port.id, channel: latestNote.channel, note: latestNote.note }
@@ -166,22 +175,76 @@ export default function TurnTakingPage() {
     recorder.current.resetFingerprints(); setObserved(''); setNotes('')
   }
   return <main dir="rtl" className="min-h-screen p-4 space-y-4 bg-sky-50" style={{ color: BRAND.navy }}>
-    <Link href="/" onClick={() => { stop(); controller.current?.disconnect() }} className="inline-block py-2 font-bold">→ חזרה לבית</Link>
+    <Link href="/" onClick={() => { stop(); controller.current?.disconnect() }} className="inline-block py-2 font-bold"><PilotIcon name="home" /> חזרה לבית</Link>
     <h1 className="text-2xl font-black">התור שלי, התור שלך</h1>
-    
     <section aria-label="משחק תורות" className="rounded-3xl bg-white p-5 text-center space-y-4 shadow-sm">
+      <div className="flex items-end justify-center gap-2" aria-label="חברי הלהקה"><StaticCharacter character="G" /><StaticCharacter character="R" /><StaticCharacter character="M" /></div>
+      <div className="flex justify-center"><BeatCore character="R" state={beatCoreStateForTurn(turn)} size={42} decorative /></div>
       <p className="text-2xl font-black min-h-16" role="status" data-turn={turn}>{turn === 'waiting' && targetActions === 2 ? 'התור שלך — נגנו פעמיים' : labels[turn]}</p>
       <p>{targetActions === 1 ? 'מקשיבים לצליל אחד, ואז מנגנים פעם אחת.' : 'מקשיבים לשני צלילים, ואז מנגנים פעמיים.'}</p>
-      <p data-action-progress aria-live="polite">{actionsInTurn} מתוך {targetActions} פעולות בסבב</p>
-      {lastAction && <p className="rounded-xl p-2 font-bold" style={{ background: BRAND.yellow }} data-input-feedback>{lastAction}</p>}
+      <p data-action-progress data-game-response-id={lastGameEventId ?? undefined} aria-live="polite">{actionsInTurn} מתוך {targetActions} פעולות בסבב</p>
+      {lastAction && <p className="rounded-xl p-2 font-bold" style={{ background: BRAND.yellow }} data-input-feedback data-input-event-id={lastAccepted ?? undefined}>{lastAction}</p>}
       <div className="flex flex-wrap justify-center gap-2">
-        <button disabled={!ready || busy} onClick={start} className="rounded-xl p-3 text-white font-bold disabled:opacity-40" style={{ background: BRAND.cyan }}>{turn === 'ready' ? 'התחילו' : 'שמעו שוב והתחילו'}</button>
-        <button onClick={() => stop()} className="rounded-xl p-3 bg-slate-100 font-bold">עצירה</button>
-        <button onClick={() => stop('ready')} className="rounded-xl p-3 bg-slate-100 font-bold">חזרה להתחלה</button>
+        <button disabled={!ready || busy} onClick={start} className="rounded-xl p-3 text-white font-bold disabled:opacity-40" style={{ background: BRAND.cyan }}><PilotIcon name={turn === 'ready' ? 'play' : 'hear-again'} /> {turn === 'ready' ? 'התחילו' : 'שמעו שוב והתחילו'}</button>
+        <button onClick={() => stop()} className="rounded-xl p-3 bg-slate-100 font-bold"><PilotIcon name="stop" /> עצירה</button>
+        <button onClick={() => stop('ready')} className="rounded-xl p-3 bg-slate-100 font-bold"><PilotIcon name="try-again" /> חזרה להתחלה</button>
       </div>
-      
-      {!ready && <p className="text-sm">המשחק מוכן לבדיקה ללא חיבור כלי. הפעילות עם כלי פיזי תתווסף לאחר אימותה.</p>}
+      {!ready && <p className="text-sm">לפני שמתחילים, מבוגר מחבר ומכוון את תופי SENOSEN דרך הגדרות הכלי.</p>}
+      {mode === 'simulation' && <div className="rounded-xl bg-amber-100 p-3 space-y-2">
+        <p className="font-bold">מצב הדמיה לפיתוח — אינו הוכחת חיבור לכלי.</p>
+        <button onClick={() => handle.current('simulation', SIM_PORT, [144, 60, 100], performance.now())} className="rounded-xl bg-white p-3 font-bold">פעולת הדמיה</button>
+      </div>}
       {error && <p role="alert" className="text-sm font-bold">{error}</p>}
     </section>
+    <button aria-expanded={setupOpen} aria-controls="instrument-setup" onClick={() => setSetupOpen(open => !open)} className="rounded-xl bg-white p-3 font-bold">
+      {setupOpen && <PilotIcon name="close" />} {setupOpen ? 'סגירת הגדרות הכלי' : 'הגדרות כלי למבוגר'}
+    </button>
+    {setupOpen && <section id="instrument-setup" aria-label="הגדרות כלי למבוגר" className="rounded-3xl bg-white p-4 space-y-4 shadow-sm">
+      <h2 className="text-lg font-black">חיבור וכיוון תופי SENOSEN</h2>
+      <p className="text-sm">החיבור מיועד ליציאת MIDI של התופים ולטאבלט Android עם Chrome. משתמשים בכבל נתונים ובמתאם המתאים ליחידה. אין מיפוי תופים קבוע: לומדים את הפד מהקלט שמגיע בפועל.</p>
+      <label className="block font-bold">מקור קלט
+        <select value={mode} onChange={e => switchMode(e.target.value as InputEvent['source'])} className="block w-full rounded-xl border p-3 mt-1">
+          <option value="web-midi">כלי MIDI — SENOSEN</option><option value="simulation">הדמיית פיתוח בלבד</option>
+        </select>
+      </label>
+      {mode === 'web-midi' && <div className="space-y-3">
+        <p>{capability}</p>
+        <button disabled={busy} onClick={connect} className="rounded-xl bg-sky-100 p-3 font-bold disabled:opacity-40">בדקו כניסות קלט</button>
+        <p role="status">{ports.length ? `כניסות שנמצאו: ${ports.map(p => p.name).join(', ')}` : 'עדיין לא נפתחה כניסת MIDI. חברו את הכלי ולחצו לבדיקה.'}</p>
+        <p className="text-sm">הכו פעם אחת על הפד שנבחר. בדקו שזה התו שמופיע, ואז מפו אותו למשחק. זיהוי כניסה לבדו אינו מאמת חיבור פיזי.</p>
+        <p data-latest-note>{latestNote ? `קלט אחרון: ${latestNote.port.name} · ערוץ ${latestNote.channel}, תו ${latestNote.note}, עוצמה ${latestNote.velocity}` : 'ממתינים להקשה חדשה על הפד'}</p>
+        <button disabled={!latestNote} onClick={learn} className="rounded-xl bg-sky-100 p-3 font-bold disabled:opacity-40"><PilotIcon name="confirm" /> מפו את התו האחרון למשחק</button>
+        {mapping && <p className="font-bold">מיפוי: ערוץ {mapping.channel}, תו {mapping.note}</p>}
+      </div>}
+      <label className="block font-bold">רמת הסבב
+        <select value={targetActions} onChange={e => { stop('ready'); const count = Number(e.target.value); state.current.targetActions = count; setTargetActions(count) }} className="block w-full rounded-xl border p-3 mt-1">
+          <option value={1}>הקשה אחת</option><option value={2}>שתי הקשות</option>
+        </select>
+      </label>
+      {ready && <button onClick={() => setSetupOpen(false)} className="rounded-xl bg-emerald-100 p-3 font-bold"><PilotIcon name="confirm" /> סיימנו לכוון, חוזרים למשחק</button>}
+      <details className="rounded-xl border p-3">
+        <summary className="cursor-pointer font-bold">אבחון ושמירת דוח למבוגר</summary>
+        <div className="mt-3 space-y-3 text-sm">
+          <p>הדוח נשמר רק בהורדה למכשיר הזה. אין צורך בשמות או בפרטים של ילדים.</p>
+          <label className="block">ציוד וכבל<input value={equipment} onChange={e => setEquipment(e.target.value)} className="block w-full rounded-lg border p-2" /></label>
+          <label className="block">מכשיר ודפדפן<input value={target} onChange={e => setTarget(e.target.value)} className="block w-full rounded-lg border p-2" /></label>
+          <label className="block">מספר פעולות פיזיות שנצפו<input type="number" min="0" step="1" value={observed} onChange={e => setObserved(e.target.value)} className="block w-full rounded-lg border p-2" /></label>
+          <label className="block">הערות לבדיקה<textarea value={notes} onChange={e => setNotes(e.target.value)} className="block w-full rounded-lg border p-2" /></label>
+          <p>תגובות במשחק: {totalAccepted.current} · מסירות זהות שסוננו: {totalDuplicate.current}</p>
+          <p>סבבים שהושלמו: {completedRounds.current} · הודעות קלט: {total.current}</p>
+          <div className="flex flex-wrap gap-2">
+            <button onClick={clear} className="rounded-xl bg-slate-100 p-3 font-bold">התחילו מדידה חדשה</button>
+            <button onClick={exportReport} className="rounded-xl bg-slate-100 p-3 font-bold">הורידו דוח JSON</button>
+          </div>
+          <p>בדיקות תוכנה אינן הוכחת כלי פיזי. יש להשוות בין ההקשות שנצפו, תגובת המשחק והאירועים בדוח.</p>
+          <ol aria-label="יומן קלט" className="max-h-64 overflow-y-auto space-y-2">
+            {rows.slice(0, 30).map(row => <li key={row.id} className="rounded-lg bg-slate-50 p-2 break-words">
+              #{row.id} · {row.source === 'simulation' ? 'הדמיה' : row.port.name} · {row.bytes.join(', ')} · {reasons[row.decision] || row.decision}
+            </li>)}
+          </ol>
+        </div>
+      </details>
+      <Link href="/teacher" onClick={() => { stop(); controller.current?.disconnect() }} className="inline-block py-2 font-bold">חזרה למצב גננת</Link>
+    </section>}
   </main>
 }

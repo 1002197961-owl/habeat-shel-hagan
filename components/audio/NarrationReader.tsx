@@ -2,6 +2,7 @@
 import type { NarrationAsset } from '@/lib/narration'
 import type { NarrationControls } from '@/hooks/useNarration'
 import { BRAND } from '@/lib/constants'
+import { PilotIcon } from '@/components/ui/PilotIcon'
 
 export function NarrationReader({asset, player, beforePlay, label = 'הקראה'}: {
   asset: NarrationAsset; player: NarrationControls; beforePlay?: () => void; label?: string
@@ -22,11 +23,11 @@ export function NarrationReader({asset, player, beforePlay, label = 'הקראה'
     </p>
     <div className="mt-3 flex flex-wrap gap-2">
       <button type="button" onClick={play} aria-label={`הקרא שוב: ${label}`} className="rounded-xl px-4 py-3 font-extrabold text-white min-h-11" style={{background:BRAND.purple}}>
-        {status === 'idle' ? '🔊 הקראו לי' : '🔊 שמעו שוב'}
+        <PilotIcon name="hear-again" /> {status === 'idle' ? 'הקראו לי' : 'שמעו שוב'}
       </button>
-      {status === 'paused' && <button type="button" onClick={() => {beforePlay?.(); void player.resume()}} className="rounded-xl border-2 px-3 py-2 font-bold min-h-11" style={{borderColor:BRAND.purple,color:BRAND.navy}}>המשך הקראה</button>}
-      <button type="button" onClick={player.pause} disabled={!running} className="rounded-xl border-2 px-3 py-2 font-bold min-h-11 disabled:opacity-40" style={{borderColor:BRAND.navy,color:BRAND.navy}}>עצירה</button>
-      <button type="button" onClick={player.reset} disabled={status === 'idle'} className="rounded-xl border-2 px-3 py-2 font-bold min-h-11 disabled:opacity-40" style={{borderColor:BRAND.navy,color:BRAND.navy}}>חזרה להתחלה</button>
+      {status === 'paused' && <button type="button" onClick={() => {beforePlay?.(); void player.resume()}} className="rounded-xl border-2 px-3 py-2 font-bold min-h-11" style={{borderColor:BRAND.purple,color:BRAND.navy}}><PilotIcon name="play" /> המשך הקראה</button>}
+      <button type="button" onClick={player.pause} disabled={!running} className="rounded-xl border-2 px-3 py-2 font-bold min-h-11 disabled:opacity-40" style={{borderColor:BRAND.navy,color:BRAND.navy}}><PilotIcon name="stop" /> עצירה</button>
+      <button type="button" onClick={player.reset} disabled={status === 'idle'} className="rounded-xl border-2 px-3 py-2 font-bold min-h-11 disabled:opacity-40" style={{borderColor:BRAND.navy,color:BRAND.navy}}><PilotIcon name="try-again" /> חזרה להתחלה</button>
     </div>
     {active && player.state.error && <p role="status" className="mt-2 text-sm text-red-800">{player.state.error}</p>}
     <span className="sr-only" role="status">{running ? 'הקראה פעילה' : status === 'paused' ? 'ההקראה נעצרה' : status === 'ended' ? 'ההקראה הסתיימה' : ''}</span>

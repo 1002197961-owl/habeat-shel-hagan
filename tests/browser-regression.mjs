@@ -22,7 +22,7 @@ for(const [engine,type,viewport] of [ ['chromium',chromium,{width:1280,height:90
    }
  })
  // Offline catalog still preserves the existing three playable instruments.
- await page.route('**/rest/v1/song_catalog?**',route=>route.fulfill({status:503,body:'unavailable'}))
+ await page.route('https://oqwzjhqzjfhdlploezad.supabase.co/**',route=>route.fulfill({status:503,body:'controlled offline fixture; no backend request'}))
  await page.goto(base);await page.getByRole('link',{name:/ספריית שירים/}).click()
  await page.waitForURL('**/library')
  await page.getByText('אין כרגע חיבור לקטלוג.',{exact:false}).waitFor()
@@ -69,11 +69,26 @@ for(const [engine,type,viewport] of [ ['chromium',chromium,{width:1280,height:90
    }
  }
  await page.getByPlaceholder('לדוגמה: שמיים, ניצוץ, ריחוף...').fill('ניצוץ')
- await page.getByRole('button',{name:'✨ צרו מילים לשיר!',exact:true}).click()
+ await page.getByRole('button',{name:'צרו מילים לשיר!',exact:true}).click()
  await page.getByText('המילים לשיר שלכם 🎵',{exact:true}).waitFor()
- await page.getByText('עדיין אין לתוצר לחן או הקלטת שירה.',{exact:false}).waitFor()
+ await page.locator('[data-song-unavailable]').waitFor()
+ assert.equal(await page.locator('[data-magic-song-player]').getAttribute('data-song-available'),'false')
+ assert.equal(await page.getByRole('button',{name:'ניגון השיר',exact:true}).count(),0)
  assert.ok(await page.evaluate(()=>window.__audio.every(a=>a.paused)))
- await page.getByRole('button',{name:'🔄 צרו מילים לשיר חדש',exact:true}).click()
+ const previousOscillators=await page.evaluate(()=>window.__osc.length)
+ await page.getByRole('button',{name:'ניגון ליווי ללא שירה',exact:true}).click()
+ await page.locator('[data-accompaniment-status="playing"]').waitFor()
+ assert.ok(await page.evaluate(n=>window.__osc.length>n,previousOscillators))
+ assert.equal(await page.locator('[data-active-word="true"]').count(),0)
+ await page.getByRole('button',{name:'הליווי מההתחלה',exact:true}).click()
+ await page.getByRole('button',{name:'עצירת הליווי',exact:true}).click()
+ await page.locator('[data-accompaniment-status="idle"]').waitFor()
+ await page.getByRole('button',{name:'ניגון ליווי ללא שירה',exact:true}).click()
+ await page.locator('[data-accompaniment-status="playing"]').waitFor()
+ await page.getByRole('button',{name:'הקראת המילים',exact:true}).click()
+ await page.locator('[data-accompaniment-status="idle"]').waitFor()
+ await page.screenshot({path:`test-results/${engine}-magic-song-audio.png`,fullPage:true})
+ await page.getByRole('button',{name:'צרו מילים לשיר חדש',exact:true}).click()
  await page.getByRole('button',{name:'הקרא שוב: שאלה 1',exact:true}).click()
  await page.getByRole('link',{name:'חזרה',exact:true}).click()
  assert.ok(await page.evaluate(()=>window.__audio.every(a=>a.paused)))
@@ -84,7 +99,7 @@ for(const [engine,type,viewport] of [ ['chromium',chromium,{width:1280,height:90
    assert.equal(await page.locator('html').getAttribute('dir'),'rtl')
  }
  assert.deepEqual(errors,[])
- results.push({engine,viewport,status:'PASS',checks:['3 original score playback flows','13 narration loads','full Hebrew transcripts','media-clock highlight','seek','pause/resume','reset','repeat','rapid multiple clicks','navigation cleanup','lyrics-only output','RTL/no horizontal overflow','no page errors']})
+ results.push({engine,viewport,status:'PASS',checks:['3 original score playback flows','13 narration loads','full Hebrew transcripts','media-clock highlight','seek','pause/resume','reset','repeat','rapid multiple clicks','navigation cleanup','unavailable sung asset is explicit','existing instrumental rehearsal playback/replay/stop','narration cancels accompaniment','no invented word highlights for instrumental','RTL/no horizontal overflow','no page errors']})
  await browser.close();console.log(engine,'PASS')
  writeFileSync('test-results/browser-regression.json',JSON.stringify(results,null,2))
 }
