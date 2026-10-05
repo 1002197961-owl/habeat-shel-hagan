@@ -1,4 +1,5 @@
 'use client'
+import { CharacterCompanions } from '@/components/characters/CharacterCompanions'
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -133,6 +134,7 @@ export default function MagicSongPage() {
         <BackHeader title="שיר הקסם ⭐" bg={BRAND.orange} onBack={() => { clearTransition(); narration.reset(); stopSpeech() }} />
       <div className="px-4 pt-3"><Link href="/guide" className="inline-block rounded-xl bg-white px-3 py-2 text-sm font-bold text-indigo-800 shadow-sm">🎬 איך יוצרים שיר?</Link></div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '70vh', gap: 20 }}>
+          <CharacterCompanions characters={['M']} height={104} />
           <motion.div animate={{ rotate: 360 }} transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }} style={{ fontSize: 64 }}>✨</motion.div>
           <div className="font-black" style={{ fontSize: 22, color: BRAND.navy }}>מרכיב מילים מהבחירות שלכם...</div>
           <WaveBar active count={16} height={28} />
@@ -147,6 +149,7 @@ export default function MagicSongPage() {
       <AppShell bg="#fffbeb">
         <BackHeader title="המילים לשיר שלכם 🎵" bg={BRAND.orange} onBack={() => { clearTransition(); narration.reset(); stopSpeech() }} />
         <div className="p-4 space-y-3">
+          <div className="rounded-2xl bg-white p-3"><CharacterCompanions /></div>
           <motion.div initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: 'spring', stiffness: 200 }}>
             <Card style={{ background: `linear-gradient(135deg,${BRAND.navy},#312e81)` }}>
               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>
@@ -192,6 +195,7 @@ export default function MagicSongPage() {
     <AppShell bg="#fffbeb">
       <BackHeader title="שיר הקסם ⭐" bg={BRAND.orange} onBack={() => { clearTransition(); narration.reset(); stopSpeech() }} />
       <div className="p-4 space-y-4">
+        <div className="rounded-2xl bg-white p-2"><CharacterCompanions characters={['M']} height={72} /></div>
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.05 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
             <span style={{ fontSize: 12, fontWeight: 700, color: '#9ca3af' }}>שאלה {qIdx + 1} מתוך {totalQ}</span>

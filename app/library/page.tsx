@@ -1,4 +1,6 @@
 'use client'
+import { CharacterIntro } from '@/components/characters/CharacterCompanions'
+
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { AppShell } from '@/components/layout/AppShell'
@@ -73,7 +75,7 @@ export default function LibraryPage() {
     <BackHeader title="ספריית השירים 🎵" bg={BRAND.cyan} onBack={() => { stop(); narration.reset() }}/>
     <div className="p-4 space-y-4" dir="rtl">
       <Link href="/guide" className="inline-block text-sm font-bold text-indigo-800">🎬 צפו בהדרכת הספרייה</Link>
-      <p className="text-sm text-slate-700 font-semibold">בחרו קטע, הקשיבו לצלילים והצטרפו לקצב. אפשר לשמוע שוב כמה שרוצים.</p>
+      <CharacterIntro character="G"><p className="text-sm text-slate-700 font-semibold">בחרו קטע, הקשיבו לצלילים והצטרפו לקצב. אפשר לשמוע שוב כמה שרוצים.</p></CharacterIntro>
       {source==='fallback' && <p className="text-sm text-amber-900 bg-amber-50 rounded-xl p-2">אין כרגע חיבור לקטלוג. שלושת קטעי ההתנסות זמינים במכשיר.</p>}
       {source==='live' && !catalog.length && <p role="status">עדיין אין שירים מאושרים להשמעה.</p>}
       {catalog.map(track => <section key={track.id} className="rounded-2xl bg-white shadow-sm border border-slate-100 p-4" aria-label={track.title}>

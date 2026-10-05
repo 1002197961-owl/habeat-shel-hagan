@@ -3,22 +3,33 @@ import Link from 'next/link'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { BRAND } from '@/lib/constants'
 import { InputRecorder, MidiTransport, routeInput, type InputEvent, type InputPort, type Mapping, type MidiAccessLike, type Turn } from '@/lib/instrumentInput'
+import { PROFILE_KEY, PAD_CUES, parseProfile, matchProfile, mappingFor, learnPad, type InstrumentProfile, type PadId } from '@/lib/instrumentProfile'
 import { TurnTone } from '@/lib/turnTone'
 import { BeatCore } from '@/components/characters/BeatCore'
 import { beatCoreStateForTurn } from '@/lib/beatCore'
 import { PilotIcon } from '@/components/ui/PilotIcon'
 import { StaticCharacter } from '@/components/characters/StaticCharacter'
 
-type Row = InputEvent & { decision: string; accepted: boolean; feedback: boolean; taskOutcome: 'not-counted' | 'in-progress' | 'completed'; uiCommitMs?: number; audioScheduledMs?: number }
+type Row = InputEvent & { padId?: PadId; expectedPad?: PadId; decision: string; accepted: boolean; feedback: boolean; taskOutcome: 'not-counted' | 'in-progress' | 'completed'; uiCommitMs?: number; audioScheduledMs?: number }
 const SIM_PORT: InputPort = { id: 'simulation', name: 'הדמיית פיתוח', manufacturer: '', state: 'connected' }
 const SIM_MAPPING: Mapping = { portId: SIM_PORT.id, channel: 1, note: 60 }
 const labels: Record<Turn, string> = { ready: 'מוכנים לנגן?', demonstrating: 'התור שלי — מקשיבים', waiting: 'התור שלך — נגנו פעם אחת', responded: 'שמענו אתכם!', paused: 'נעצור רגע' }
-const reasons: Record<string, string> = { 'turn-response':'הפעיל תגובה במשחק', 'duplicate-delivery':'מסירה כפולה זהה', 'other-source':'מקור אחר', 'note-off':'שחרור', other:'הודעה אחרת', invalid:'הודעה לא תקינה', unmapped:'לא ממופה', 'outside-turn':'מחוץ לתור', 'stale-before-turn':'נוצר לפני תחילת התור' }
+const reasons: Record<string, string> = { 'different-pad':'פד מוכר אחר — לא הפד המבוקש', 'turn-response':'הפעיל תגובה במשחק', 'duplicate-delivery':'מסירה כפולה זהה', 'other-source':'מקור אחר', 'note-off':'שחרור', other:'הודעה אחרת', invalid:'הודעה לא תקינה', unmapped:'לא ממופה', 'outside-turn':'מחוץ לתור', 'stale-before-turn':'נוצר לפני תחילת התור' }
 
 export default function TurnTakingPage() {
   const [mode, setMode] = useState<InputEvent['source']>('web-midi')
   const [ports, setPorts] = useState<InputPort[]>([])
   const [mapping, setMapping] = useState<Mapping | null>(null)
+  const [profile, setProfile] = useState<InstrumentProfile | null>(null)
+  const profileRef = useRef<InstrumentProfile | null>(null)
+  const [selectedPad, setSelectedPad] = useState<PadId>('green')
+  const [learnSlot, setLearnSlot] = useState<PadId>('green')
+  const [profileStatus, setProfileStatus] = useState('')
+  const [inputPulse, setInputPulse] = useState(false)
+  const [feedbackPad, setFeedbackPad] = useState<PadId>('green')
+  const pulseTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const selectedPadRef = useRef<PadId>('green')
+  selectedPadRef.current = selectedPad
   const [turn, setTurn] = useState<Turn>('ready')
   const [rows, setRows] = useState<Row[]>([])
   const [connections, setConnections] = useState<{ at: string; ports: InputPort[] }[]>([])
@@ -54,6 +65,7 @@ export default function TurnTakingPage() {
     generation.current++
     timers.current.forEach(clearTimeout); timers.current = []
     tone.current?.stop()
+    setInputPulse(false); if (pulseTimer.current) clearTimeout(pulseTimer.current)
     state.current.turn = next; setTurn(next); setBusy(false)
     state.current.actionsInTurn = 0; setActionsInTurn(0)
     setLastGameEventId(null)
@@ -64,9 +76,11 @@ export default function TurnTakingPage() {
     const event = recorder.current.receive(source, port, bytes, stamp, performance.now(), new Date().toISOString())
     const s = state.current, selected = s.mode === 'simulation' ? SIM_MAPPING : s.mapping
     const decision = routeInput(event, s.mode, selected, s.turn, s.waitingSince, s.targetActions - s.actionsInTurn)
-    const mapped = !event.duplicate && source === s.mode && event.kind === 'note-on' && selected?.portId === port.id && selected.channel === event.channel && selected.note === event.note
-    const feedback = mapped && decision.reason !== 'stale-before-turn' && (s.turn === 'waiting' || s.turn === 'demonstrating' || s.turn === 'responded')
-    const row: Row = { ...event, accepted: decision.accepted, feedback, decision: decision.reason, taskOutcome: 'not-counted' }
+    const learnedPad = profileRef.current?.pads.find(p => p.channel === event.channel && p.note === event.note)
+    const mapped = !event.duplicate && source === s.mode && event.kind === 'note-on' && selected?.portId === port.id && (s.mode === 'simulation' ? selected.channel === event.channel && selected.note === event.note : !!learnedPad)
+    if (mapped && !decision.accepted && decision.reason === 'unmapped') decision.reason = 'different-pad'
+    const feedback = mapped && (event.browserEventMs === null || event.browserEventMs >= s.waitingSince) && decision.reason !== 'stale-before-turn' && (s.turn === 'waiting' || s.turn === 'demonstrating' || s.turn === 'responded')
+    const row: Row = { ...event, padId: mapped ? learnedPad?.id : undefined, expectedPad: selectedPadRef.current, accepted: decision.accepted, feedback, decision: decision.reason, taskOutcome: 'not-counted' }
     total.current++
     if (event.duplicate) totalDuplicate.current++
     if (mapped) totalMatched.current++
@@ -75,7 +89,9 @@ export default function TurnTakingPage() {
       if (audio) row.audioScheduledMs = audio.scheduledAtMs - event.receivedMs
       else setError('הקלט התקבל, אך השמע אינו מוכן. עצרו והתחילו שוב.')
       feedbackResponses.current++; setLastAccepted(event.id)
-      setLastAction(`נקלטה פעולה ${feedbackResponses.current}`)
+      setFeedbackPad(learnedPad?.id || selectedPadRef.current); setInputPulse(true); if (pulseTimer.current) clearTimeout(pulseTimer.current)
+      pulseTimer.current = setTimeout(() => setInputPulse(false), 650)
+      setLastAction(learnedPad ? `שמענו את הפד ה${PAD_CUES.find(p => p.id === learnedPad.id)!.label}${decision.reason === 'different-pad' ? ' — עכשיו הפד המסומן' : '!'}` : `נקלטה פעולה ${feedbackResponses.current}`)
     }
     if (decision.accepted) {
       // Update synchronous counters before rendering; a duplicate cannot fill the second slot.
@@ -97,21 +113,40 @@ export default function TurnTakingPage() {
   }, [lastAccepted])
   useEffect(() => {
     setCapability(window.isSecureContext && 'requestMIDIAccess' in navigator && typeof navigator.requestMIDIAccess === 'function' ? 'Web MIDI זמין לבקשת הרשאה' : 'Web MIDI אינו זמין כאן')
+    try {
+      const saved = parseProfile(localStorage.getItem(PROFILE_KEY))
+      profileRef.current = saved; setProfile(saved)
+      if (saved) { setSelectedPad(saved.pads[0].id); selectedPadRef.current = saved.pads[0].id; setProfileStatus('הכיוון השמור מוכן. חברו את הכלי כדי לזהות אותו.') }
+    } catch { setProfileStatus('השמירה המקומית אינה זמינה. אפשר לכוון ולייצא קובץ גיבוי.') }
     tone.current = new TurnTone()
     controller.current = new MidiTransport((port, data, stamp) => handle.current('web-midi', port, data, stamp), next => {
       setPorts(next)
+      const matched = matchProfile(profileRef.current, next)
+      const restored = mappingFor(profileRef.current, matched, selectedPadRef.current)
+      if (restored) { state.current.mapping = restored; setMapping(restored); setProfileStatus('הכלי המוכר זוהה — הכיוון השמור נטען') }
       setConnections(previous => [{ at: new Date().toISOString(), ports: next }, ...previous].slice(0, 100))
-      if (state.current.mode === 'web-midi' && state.current.mapping && !next.some(p => p.id === state.current.mapping!.portId)) {
-        stop(); setCaptureSince(performance.now()); setError('הכלי נותק. חברו מחדש והתחילו סבב חדש כשאתם מוכנים.')
+      if (state.current.mode === 'web-midi' && state.current.mapping && !restored) {
+        stop(); state.current.mapping = null; setMapping(null); setCaptureSince(performance.now()); setError('הכלי נותק. חברו מחדש והתחילו סבב חדש כשאתם מוכנים.')
       }
     }, setError)
+    let disposed = false
+    const reconnectGranted = async () => {
+      if (!profileRef.current || state.current.mode !== 'web-midi' || !navigator.permissions) return
+      try {
+        const permission = await navigator.permissions.query({name:'midi' as PermissionName, sysex:false} as PermissionDescriptor)
+        if (!disposed && permission.state === 'granted' && window.isSecureContext && navigator.requestMIDIAccess)
+          await controller.current?.connect(() => navigator.requestMIDIAccess({sysex:false}) as unknown as Promise<MidiAccessLike>)
+      } catch { /* Unsupported permission query: the explicit connect button remains available. */ }
+    }
+    void reconnectGranted()
     const leave = () => { stop(); controller.current?.disconnect(); setPorts([]); setCaptureSince(performance.now()) }
-    const hidden = () => { if (document.hidden) leave() }
+    const hidden = () => { if (document.hidden) leave(); else void reconnectGranted() }
     window.addEventListener('pagehide', leave); document.addEventListener('visibilitychange', hidden)
     return () => {
+      disposed = true
       generation.current++
       timers.current.forEach(clearTimeout)
-      controller.current?.disconnect(); tone.current?.dispose()
+      controller.current?.disconnect(); tone.current?.dispose(); if (pulseTimer.current) clearTimeout(pulseTimer.current)
       window.removeEventListener('pagehide', leave); document.removeEventListener('visibilitychange', hidden)
     }
   }, [])
@@ -148,18 +183,48 @@ export default function TurnTakingPage() {
     setMode(next); setError('')
   }
   const latestNote = rows.find(r => r.source === 'web-midi' && r.receivedMs >= captureSince && r.kind === 'note-on' && !r.duplicate && ports.some(p => p.id === r.port.id))
+  const saveProfile = (next: InstrumentProfile) => {
+    profileRef.current = next; setProfile(next)
+    try { localStorage.setItem(PROFILE_KEY, JSON.stringify(next)); setProfileStatus('הכיוון נשמר בדפדפן הזה לפעמים הבאות') }
+    catch { setProfileStatus('הכיוון פעיל אך לא נשמר. הורידו גיבוי לפני הסגירה.') }
+  }
+  const selectPad = (id: PadId) => {
+    stop('ready'); selectedPadRef.current = id; setSelectedPad(id)
+    const next = mappingFor(profileRef.current, matchProfile(profileRef.current, ports), id)
+    state.current.mapping = next; setMapping(next)
+  }
   const learn = () => {
     if (!latestNote || latestNote.channel === null || latestNote.note === null) return
-    stop('ready'); const next = { portId: latestNote.port.id, channel: latestNote.channel, note: latestNote.note }
-    state.current.mapping = next; setMapping(next)
+    try {
+      const next = learnPad(profileRef.current, latestNote.port, learnSlot, latestNote.channel, latestNote.note)
+      saveProfile(next); setError(''); selectPad(learnSlot); setCaptureSince(performance.now())
+    } catch (e) { setError(e instanceof Error && e.message === 'duplicate-pad' ? 'התו הזה כבר שייך לפד אחר. הקישו על הפד שבחרתם.' : 'זה כלי שונה מהפרופיל. אשרו התאמה לכלי המחובר לפני המשך הכיוון.') }
+  }
+  const downloadProfile = () => {
+    if (!profile) return
+    const url = URL.createObjectURL(new Blob([JSON.stringify(profile, null, 2)], {type:'application/json'}))
+    const a = document.createElement('a'); a.href = url; a.download = 'habeat-pads-v1.json'; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000)
+  }
+  const importProfile = async (file?: File) => {
+    if (!file) return
+    if (file.size > 20000) { setError('קובץ הפרופיל גדול מדי'); return }
+    const imported = parseProfile(await file.text())
+    if (!imported) { setError('קובץ הכיוון אינו תקין או שגרסתו אינה נתמכת'); return }
+    stop('ready'); saveProfile(imported); selectPad(imported.pads[0].id)
+    setProfileStatus('הפרופיל יובא. אם זהות הכניסה שונה, מבוגר צריך לאשר את ההתאמה ולבדוק כל פד.')
+  }
+  const confirmPort = (port: InputPort) => {
+    if (!profile || !window.confirm('להחיל את הכיוון השמור על הכניסה הזאת? יש לבדוק בפועל כל פד לפני המשחק. שם ודגם זהים אינם מבטיחים מיפוי זהה.')) return
+    saveProfile({...profile, port:{id:port.id,name:port.name,manufacturer:port.manufacturer}})
+    selectPad(selectedPad)
   }
   const exportReport = () => {
     const report = {
-      schema: 2, createdAt: new Date().toISOString(), version: process.env.NEXT_PUBLIC_BUILD_SHA || 'audio-word-sync-integration-candidate',
+      schema: 3, createdAt: new Date().toISOString(), version: process.env.NEXT_PUBLIC_BUILD_SHA || 'audio-word-sync-integration-candidate',
       url: location.origin + location.pathname, browser: navigator.userAgent, language: navigator.language,
       viewport: { width: innerWidth, height: innerHeight }, capability, equipment, targetDevice: target,
       physicalProof: 'NOT_AUTOMATICALLY_VERIFIED', observation: { physicalActionCount: observed === '' ? null : Number(observed), notes },
-      mode, mapping, ports, connections, targetActions, rhythmAccuracy: 'NOT_ASSESSED',
+      mode, mapping, profile, expectedPad: selectedPad, ports, connections, targetActions, rhythmAccuracy: 'NOT_ASSESSED',
       totals: { messages: total.current, mappedNoteOns: totalMatched.current, identicalDuplicateDeliveries: totalDuplicate.current, feedbackResponses: feedbackResponses.current, gameResponses: totalAccepted.current, completedRounds: completedRounds.current, omittedFromLog: Math.max(0, total.current - rowsRef.current.length) },
       timingMeaning: 'receivedAt is browser wall time. receivedMs and browserEventMs use the browser monotonic clock, not a hardware clock. uiCommitMs is JS-to-DOM commit, not paint or physical-to-screen latency. audioScheduledMs is scheduling, not sound heard. Missed physical actions and end-to-end latency require external observation.',
       events: [...rowsRef.current].reverse(),
@@ -178,8 +243,15 @@ export default function TurnTakingPage() {
     <Link href="/" onClick={() => { stop(); controller.current?.disconnect() }} className="inline-block py-2 font-bold"><PilotIcon name="home" /> חזרה לבית</Link>
     <h1 className="text-2xl font-black">התור שלי, התור שלך</h1>
     <section aria-label="משחק תורות" className="rounded-3xl bg-white p-5 text-center space-y-4 shadow-sm">
-      <div className="flex items-end justify-center gap-2" aria-label="חברי הלהקה"><StaticCharacter character="G" /><StaticCharacter character="R" /><StaticCharacter character="M" /></div>
-      <div className="flex justify-center"><BeatCore character="R" state={beatCoreStateForTurn(turn)} size={42} decorative /></div>
+      <div className="flex items-end justify-center gap-2 rounded-3xl" data-character-response={inputPulse ? "playing" : "idle"} data-response-event-id={lastAccepted ?? undefined} style={{ outline: inputPulse ? `6px solid ${PAD_CUES.find(p => p.id === feedbackPad)!.color}` : "6px solid transparent" }} aria-label="חברי הלהקה"><StaticCharacter character="G" /><StaticCharacter character="R" /><StaticCharacter character="M" /></div>
+      <div className="flex justify-center"><BeatCore character="R" state={inputPulse ? 'playing' : beatCoreStateForTurn(turn)} size={84} decorative /></div>
+      {(ready || profile) && <div data-target-pad={selectedPad} className="mx-auto max-w-xs rounded-3xl border-4 border-slate-800 p-4" style={{background: PAD_CUES.find(p => p.id === selectedPad)!.color}}>
+        <span aria-hidden="true" className="text-5xl text-slate-900">{PAD_CUES.find(p => p.id === selectedPad)!.symbol}</span>
+        <p className="font-black text-xl text-slate-900">מנגנים על הפד ה{PAD_CUES.find(p => p.id === selectedPad)!.label}</p>
+        <div dir="ltr" className="mt-3 grid grid-cols-4 gap-2 rounded-xl bg-white/90 p-2" aria-label="מיקום הפד בכלי, לוח הכפתורים למעלה">
+          {PAD_CUES.map(p => <span key={p.id} data-pad-position={p.id} aria-label={p.label} style={{gridRow:p.row,gridColumn:p.column,background:p.color,opacity:p.id === selectedPad ? 1 : 0.3,outline:p.id === selectedPad ? '3px solid #0f172a' : undefined}} className="flex min-h-8 items-center justify-center rounded-full border border-slate-600 font-black text-slate-900">{p.symbol}</span>)}
+        </div>
+      </div>}
       <p className="text-2xl font-black min-h-16" role="status" data-turn={turn}>{turn === 'waiting' && targetActions === 2 ? 'התור שלך — נגנו פעמיים' : labels[turn]}</p>
       <p>{targetActions === 1 ? 'מקשיבים לצליל אחד, ואז מנגנים פעם אחת.' : 'מקשיבים לשני צלילים, ואז מנגנים פעמיים.'}</p>
       <p data-action-progress data-game-response-id={lastGameEventId ?? undefined} aria-live="polite">{actionsInTurn} מתוך {targetActions} פעולות בסבב</p>
@@ -201,7 +273,7 @@ export default function TurnTakingPage() {
     </button>
     {setupOpen && <section id="instrument-setup" aria-label="הגדרות כלי למבוגר" className="rounded-3xl bg-white p-4 space-y-4 shadow-sm">
       <h2 className="text-lg font-black">חיבור וכיוון תופי SENOSEN</h2>
-      <p className="text-sm">החיבור מיועד ליציאת MIDI של התופים ולטאבלט Android עם Chrome. משתמשים בכבל נתונים ובמתאם המתאים ליחידה. אין מיפוי תופים קבוע: לומדים את הפד מהקלט שמגיע בפועל.</p>
+      <p className="text-sm">החיבור מיועד ליציאת MIDI של התופים ולמחשב או לטאבלט עם דפדפן שתומך ב־Web MIDI, כולל Chromebook עם Chrome. משתמשים בכבל נתונים ובמתאם המתאים ליחידה. אין מיפוי תופים קבוע: לומדים כל פד מהקלט שמגיע בפועל ושומרים בדפדפן. תשעת המיקומים מתאימים לפריסה שבתמונה; ארבעת הפדים התכולים נבדלים לפי מיקום ומספר. לוח הכפתורים נמצא למעלה, ושמאל וימין הם מצד הנגן. המבוגר מאמת כל מיקום מול הכלי בפועל; אין זיהוי אוטומטי של צבע פיזי.</p>
       <label className="block font-bold">מקור קלט
         <select value={mode} onChange={e => switchMode(e.target.value as InputEvent['source'])} className="block w-full rounded-xl border p-3 mt-1">
           <option value="web-midi">כלי MIDI — SENOSEN</option><option value="simulation">הדמיית פיתוח בלבד</option>
@@ -211,9 +283,23 @@ export default function TurnTakingPage() {
         <p>{capability}</p>
         <button disabled={busy} onClick={connect} className="rounded-xl bg-sky-100 p-3 font-bold disabled:opacity-40">בדקו כניסות קלט</button>
         <p role="status">{ports.length ? `כניסות שנמצאו: ${ports.map(p => p.name).join(', ')}` : 'עדיין לא נפתחה כניסת MIDI. חברו את הכלי ולחצו לבדיקה.'}</p>
+        <p role="status" data-profile-status>{profileStatus}</p>
+        <label className="block font-bold">הפד שמכוונים
+          <select value={learnSlot} onChange={e => {setLearnSlot(e.target.value as PadId); setCaptureSince(performance.now())}} className="block w-full rounded-xl border p-3">
+            {PAD_CUES.map(p => <option key={p.id} value={p.id}>{p.label} {p.symbol}{profile?.pads.some(x => x.id === p.id) ? ' — שמור' : ''}</option>)}
+          </select>
+        </label>
         <p className="text-sm">הכו פעם אחת על הפד שנבחר. בדקו שזה התו שמופיע, ואז מפו אותו למשחק. זיהוי כניסה לבדו אינו מאמת חיבור פיזי.</p>
         <p data-latest-note>{latestNote ? `קלט אחרון: ${latestNote.port.name} · ערוץ ${latestNote.channel}, תו ${latestNote.note}, עוצמה ${latestNote.velocity}` : 'ממתינים להקשה חדשה על הפד'}</p>
         <button disabled={!latestNote} onClick={learn} className="rounded-xl bg-sky-100 p-3 font-bold disabled:opacity-40"><PilotIcon name="confirm" /> מפו את התו האחרון למשחק</button>
+        {profile && <div className="space-y-2">
+          <label className="block font-bold">הפד למשחק<select value={selectedPad} onChange={e => selectPad(e.target.value as PadId)} className="block w-full rounded-xl border p-3">{profile.pads.map(p => <option key={p.id} value={p.id}>{PAD_CUES.find(c => c.id === p.id)!.label} {PAD_CUES.find(c => c.id === p.id)!.symbol}</option>)}</select></label>
+          <p>{profile.pads.length} פדים שמורים. כוונו פעם אחת את כל הפדים שבהם תרצו להשתמש.</p>
+          {!matchProfile(profile, ports) && ports.map(p => <button key={p.id} onClick={() => confirmPort(p)} className="rounded-xl bg-amber-100 p-3">אישור מבוגר: התאימו פרופיל ל־{p.name}</button>)}
+          <button onClick={downloadProfile} className="rounded-xl bg-slate-100 p-3">הורידו גיבוי כיוון</button>
+        </div>}
+        <label className="block">ייבוא כיוון מגן אחר<input type="file" accept="application/json,.json" onChange={e => {void importProfile(e.target.files?.[0]); e.target.value = ''}} className="block max-w-full" /></label>
+        <p className="text-sm">הכיוון נשמר למכשיר ולכתובת האתר האלה. במכשיר או כתובת חדשים אפשר לייבא גיבוי; זהות שונה מחייבת אישור ובדיקת מבוגר.</p>
         {mapping && <p className="font-bold">מיפוי: ערוץ {mapping.channel}, תו {mapping.note}</p>}
       </div>}
       <label className="block font-bold">רמת הסבב

@@ -1,4 +1,6 @@
 'use client'
+import { CharacterIntro } from '@/components/characters/CharacterCompanions'
+
 import Link from 'next/link'
 
 import { useEffect, useRef, useState } from 'react'
@@ -65,7 +67,7 @@ export default function RecordingPage() {
     <BackHeader title="אולפן הקלטה 🎤" bg={BRAND.orange} />
       <div className="px-4 pt-3"><Link href="/guide" className="inline-block rounded-xl bg-white px-3 py-2 text-sm font-bold text-indigo-800 shadow-sm">🎬 איך מקליטים?</Link></div>
     <div className="p-4 space-y-4" dir="rtl">
-      <p className="text-sm text-slate-700">בחרו הקלטת קול או צילום קליפ, אשרו גישה למכשיר, ואז לחצו על התחלה. בקשו עזרה מגננת לפני שמצלמים ילדים.</p>
+      <CharacterIntro character="M"><p className="text-sm text-slate-700">בחרו הקלטת קול או צילום קליפ, אשרו גישה למכשיר, ואז לחצו על התחלה. בקשו עזרה מגננת לפני שמצלמים ילדים.</p></CharacterIntro>
       <div className="flex gap-2">
         <button disabled={recording} onClick={() => setKind('audio')} className="flex-1 rounded-xl p-3 font-bold" style={{ background: kind === 'audio' ? BRAND.pink : '#e5e7eb', color: kind === 'audio' ? 'white' : BRAND.navy }}>🎙️ קול</button>
         <button disabled={recording} onClick={() => setKind('video')} className="flex-1 rounded-xl p-3 font-bold" style={{ background: kind === 'video' ? BRAND.purple : '#e5e7eb', color: kind === 'video' ? 'white' : BRAND.navy }}>🎬 וידאו</button>

@@ -1,4 +1,5 @@
 'use client'
+import { CharacterCompanions } from '@/components/characters/CharacterCompanions'
 
 import { useState } from 'react'
 import Link from 'next/link'
@@ -18,6 +19,7 @@ export default function GuidePage() {
     <Link href="/" className="font-bold text-indigo-800">→ חזרה לבית</Link>
     <h1 className="text-2xl font-black mt-5">איך משתמשים בביט של הגן?</h1>
     <p className="text-sm mt-2">הדרכות קצרות לילדים.</p>
+    <div className="mt-4 w-fit max-w-full rounded-2xl bg-white p-3"><CharacterCompanions /></div>
     <div className="space-y-4 mt-5">{lessons[audience].map((lesson, index) => <section key={lesson.title} className="rounded-2xl bg-white p-4 shadow-sm">
       <h2 className="font-black text-lg">{index + 1}. {lesson.emoji} {lesson.title}</h2>
       <p className="text-sm mt-2 leading-relaxed">{lesson.text}</p>

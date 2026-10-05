@@ -21,3 +21,11 @@ Public manifests retain output hashes, coordinates, dimensions and pixel-compari
 ## Verification boundary
 
 Portable tests cover immutable core sources, semantic-only state changes, safe runtime values, exactly eleven source-hashed icons, exactly three FRONT-only files and exact source coordinates. Software tests do not establish physical hardware compatibility or listening quality.
+
+## Child-facing placements
+
+The existing FRONT images also appear in the home welcome area (G/R/M), the library introduction (G), the magic-song questions and waiting state (M), the magic-song result (G/R/M), the child guide (G/R/M), and the recording introduction (M). They are small, static, decorative companions in normal document flow, with no click targets, poses, state mapping, audio, or activity claims. White containers retain the images’ original white backgrounds without editing the PNGs.
+
+The original turn-taking layout and behavior are unchanged. Teacher, station management, beat management, dashboard, and behind-the-scenes screens receive no added companions. Existing text, controls, narration, recording permissions, and song behavior are preserved.
+
+Local presentation regression: `CHROMIUM_EXECUTABLE=/usr/bin/chromium node scripts/test-browser.mjs --characters-only` after a successful build. This checks the placements at 320, 390, 768, and 1280 pixels, question-to-result/reset transitions, recording mode selection without device permission, image loading, RTL, and horizontal bounds. All non-local requests are blocked in that test.
