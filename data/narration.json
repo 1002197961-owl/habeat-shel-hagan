@@ -1,0 +1,739 @@
+{
+  "question-1": {
+    "id": "question-1",
+    "src": "/audio/question-1.mp3",
+    "text": "על מה יהיה השיר? בחרו נושא: חיות, טבע או חברות?",
+    "duration": 5.7469375,
+    "sha256": "c31cb2bbcad47932b264d461e9b65974920547ea8bf01605fe28ca5c21f4eaf0",
+    "alignment": {
+      "method": "recording-forced-alignment",
+      "model": "faster-whisper 1.2.1 / Systran faster-whisper-small int8",
+      "review": "transcript-checked-against-source; physical-device-listening-pending"
+    },
+    "words": [
+      {
+        "word": "על",
+        "start": 0.0,
+        "end": 0.46
+      },
+      {
+        "word": "מה",
+        "start": 0.46,
+        "end": 0.64
+      },
+      {
+        "word": "יהיה",
+        "start": 0.64,
+        "end": 0.9
+      },
+      {
+        "word": "השיר?",
+        "start": 0.9,
+        "end": 1.28
+      },
+      {
+        "word": "בחרו",
+        "start": 1.64,
+        "end": 2.2
+      },
+      {
+        "word": "נושא:",
+        "start": 2.2,
+        "end": 2.84
+      },
+      {
+        "word": "חיות,",
+        "start": 3.0,
+        "end": 3.46
+      },
+      {
+        "word": "טבע",
+        "start": 4.02,
+        "end": 4.42
+      },
+      {
+        "word": "או",
+        "start": 4.42,
+        "end": 4.86
+      },
+      {
+        "word": "חברות?",
+        "start": 4.86,
+        "end": 5.4
+      }
+    ]
+  },
+  "question-2": {
+    "id": "question-2",
+    "src": "/audio/question-2.mp3",
+    "text": "מי הגיבור של השיר? ילד קטן, ילדה קטנה או חיה חמודה?",
+    "duration": 6.269375,
+    "sha256": "10f7b6d262da1d8c5c843899faab8ba2f490ede3f832e4edada06f80f13e2190",
+    "alignment": {
+      "method": "recording-forced-alignment",
+      "model": "faster-whisper 1.2.1 / Systran faster-whisper-small int8",
+      "review": "transcript-checked-against-source; physical-device-listening-pending"
+    },
+    "words": [
+      {
+        "word": "מי",
+        "start": 0.0,
+        "end": 0.56
+      },
+      {
+        "word": "הגיבור",
+        "start": 0.56,
+        "end": 1.04
+      },
+      {
+        "word": "של",
+        "start": 1.04,
+        "end": 1.22
+      },
+      {
+        "word": "השיר?",
+        "start": 1.22,
+        "end": 1.64
+      },
+      {
+        "word": "ילד",
+        "start": 1.92,
+        "end": 2.46
+      },
+      {
+        "word": "קטן,",
+        "start": 2.46,
+        "end": 2.88
+      },
+      {
+        "word": "ילדה",
+        "start": 3.36,
+        "end": 3.66
+      },
+      {
+        "word": "קטנה",
+        "start": 3.66,
+        "end": 4.0
+      },
+      {
+        "word": "או",
+        "start": 4.0,
+        "end": 5.24
+      },
+      {
+        "word": "חיה",
+        "start": 5.24,
+        "end": 5.48
+      },
+      {
+        "word": "חמודה?",
+        "start": 5.48,
+        "end": 5.88
+      }
+    ]
+  },
+  "question-3": {
+    "id": "question-3",
+    "src": "/audio/question-3.mp3",
+    "text": "איך הגיבור מרגיש? שמחה, הפתעה או אהבה?",
+    "duration": 4.6759375,
+    "sha256": "8c292eec0c9731069bef5ca250d5f93acbea77d1a07b34d44deced428d1ab180",
+    "alignment": {
+      "method": "recording-forced-alignment",
+      "model": "faster-whisper 1.2.1 / Systran faster-whisper-small int8",
+      "review": "transcript-checked-against-source; physical-device-listening-pending"
+    },
+    "words": [
+      {
+        "word": "איך",
+        "start": 0.0,
+        "end": 0.52
+      },
+      {
+        "word": "הגיבור",
+        "start": 0.52,
+        "end": 0.88
+      },
+      {
+        "word": "מרגיש?",
+        "start": 0.88,
+        "end": 1.38
+      },
+      {
+        "word": "שמחה,",
+        "start": 1.66,
+        "end": 2.36
+      },
+      {
+        "word": "הפתעה",
+        "start": 2.88,
+        "end": 3.7
+      },
+      {
+        "word": "או",
+        "start": 3.7,
+        "end": 3.96
+      },
+      {
+        "word": "אהבה?",
+        "start": 3.96,
+        "end": 4.28
+      }
+    ]
+  },
+  "question-4": {
+    "id": "question-4",
+    "src": "/audio/question-4.mp3",
+    "text": "איפה מתרחש הסיפור? בגן ילדים, בים או ביער?",
+    "duration": 5.146125,
+    "sha256": "e4e0ed5b4bd2168effe8d3865204782fcf6e25dae3bfee290d642c366cc645ee",
+    "alignment": {
+      "method": "recording-forced-alignment",
+      "model": "faster-whisper 1.2.1 / Systran faster-whisper-small int8",
+      "review": "transcript-checked-against-source; physical-device-listening-pending"
+    },
+    "words": [
+      {
+        "word": "איפה",
+        "start": 0.0,
+        "end": 0.58
+      },
+      {
+        "word": "מתרחש",
+        "start": 0.58,
+        "end": 1.04
+      },
+      {
+        "word": "הסיפור?",
+        "start": 1.04,
+        "end": 1.54
+      },
+      {
+        "word": "בגן",
+        "start": 1.8,
+        "end": 2.32
+      },
+      {
+        "word": "ילדים,",
+        "start": 2.32,
+        "end": 2.82
+      },
+      {
+        "word": "בים",
+        "start": 3.24,
+        "end": 3.68
+      },
+      {
+        "word": "או",
+        "start": 3.68,
+        "end": 4.26
+      },
+      {
+        "word": "ביער?",
+        "start": 4.26,
+        "end": 4.82
+      }
+    ]
+  },
+  "question-5": {
+    "id": "question-5",
+    "src": "/audio/question-5.mp3",
+    "text": "מה הגיבור עושה? שר, רוקד או משחק?",
+    "duration": 4.3101875,
+    "sha256": "7d1430570709539b24f78f2734afa335a9f2b19f406304475637d18faaae6ad7",
+    "alignment": {
+      "method": "recording-forced-alignment",
+      "model": "faster-whisper 1.2.1 / Systran faster-whisper-small int8",
+      "review": "transcript-checked-against-source; physical-device-listening-pending"
+    },
+    "words": [
+      {
+        "word": "מה",
+        "start": 0.0,
+        "end": 0.52
+      },
+      {
+        "word": "הגיבור",
+        "start": 0.52,
+        "end": 0.94
+      },
+      {
+        "word": "עושה?",
+        "start": 0.94,
+        "end": 1.5
+      },
+      {
+        "word": "שר,",
+        "start": 1.66,
+        "end": 2.16
+      },
+      {
+        "word": "רוקד",
+        "start": 2.46,
+        "end": 3.0
+      },
+      {
+        "word": "או",
+        "start": 3.0,
+        "end": 3.4
+      },
+      {
+        "word": "משחק?",
+        "start": 3.4,
+        "end": 3.96
+      }
+    ]
+  },
+  "question-6": {
+    "id": "question-6",
+    "src": "/audio/question-6.mp3",
+    "text": "איזה כלי נגינה מתאים? גיטרה, תופים או פסנתר?",
+    "duration": 4.96325,
+    "sha256": "930855bcdd11d79933a313aaea468f77098b8c53c737a77d12acf394b8321f43",
+    "alignment": {
+      "method": "recording-forced-alignment",
+      "model": "faster-whisper 1.2.1 / Systran faster-whisper-small int8",
+      "review": "transcript-checked-against-source; physical-device-listening-pending"
+    },
+    "words": [
+      {
+        "word": "איזה",
+        "start": 0.0,
+        "end": 0.54
+      },
+      {
+        "word": "כלי",
+        "start": 0.54,
+        "end": 0.88
+      },
+      {
+        "word": "נגינה",
+        "start": 0.88,
+        "end": 1.24
+      },
+      {
+        "word": "מתאים?",
+        "start": 1.24,
+        "end": 1.72
+      },
+      {
+        "word": "גיטרה,",
+        "start": 2.04,
+        "end": 2.72
+      },
+      {
+        "word": "תופים",
+        "start": 3.12,
+        "end": 3.66
+      },
+      {
+        "word": "או",
+        "start": 3.66,
+        "end": 4.02
+      },
+      {
+        "word": "פסנתר?",
+        "start": 4.02,
+        "end": 4.56
+      }
+    ]
+  },
+  "question-7": {
+    "id": "question-7",
+    "src": "/audio/question-7.mp3",
+    "text": "מה הקצב שמתאים? מהיר, בינוני או איטי?",
+    "duration": 4.8326875,
+    "sha256": "56b5cee993f220c0d49998798a13718e2799122b74b9d47d800f84267fa4dbf4",
+    "alignment": {
+      "method": "recording-forced-alignment",
+      "model": "faster-whisper 1.2.1 / Systran faster-whisper-small int8",
+      "review": "transcript-checked-against-source; physical-device-listening-pending"
+    },
+    "words": [
+      {
+        "word": "מה",
+        "start": 0.0,
+        "end": 0.46
+      },
+      {
+        "word": "הקצב",
+        "start": 0.46,
+        "end": 0.84
+      },
+      {
+        "word": "שמתאים?",
+        "start": 0.84,
+        "end": 1.44
+      },
+      {
+        "word": "מהיר,",
+        "start": 1.78,
+        "end": 2.28
+      },
+      {
+        "word": "בינוני",
+        "start": 2.66,
+        "end": 3.46
+      },
+      {
+        "word": "או",
+        "start": 3.46,
+        "end": 4.06
+      },
+      {
+        "word": "איטי?",
+        "start": 4.06,
+        "end": 4.44
+      }
+    ]
+  },
+  "question-8": {
+    "id": "question-8",
+    "src": "/audio/question-8.mp3",
+    "text": "מה קורה בסוף השיר? חגיגה, חיבוק או שקיעה?",
+    "duration": 4.5975625,
+    "sha256": "b5639e477729f7c1b0dce4bfc572583871e7649311e61dd5d55ae3fd2a15aae7",
+    "alignment": {
+      "method": "recording-forced-alignment",
+      "model": "faster-whisper 1.2.1 / Systran faster-whisper-small int8",
+      "review": "transcript-checked-against-source; physical-device-listening-pending"
+    },
+    "words": [
+      {
+        "word": "מה",
+        "start": 0.0,
+        "end": 0.44
+      },
+      {
+        "word": "קורה",
+        "start": 0.44,
+        "end": 0.68
+      },
+      {
+        "word": "בסוף",
+        "start": 0.68,
+        "end": 1.02
+      },
+      {
+        "word": "השיר?",
+        "start": 1.02,
+        "end": 1.4
+      },
+      {
+        "word": "חגיגה,",
+        "start": 1.84,
+        "end": 2.48
+      },
+      {
+        "word": "חיבוק",
+        "start": 2.8,
+        "end": 3.3
+      },
+      {
+        "word": "או",
+        "start": 3.3,
+        "end": 3.8
+      },
+      {
+        "word": "שקיעה?",
+        "start": 3.8,
+        "end": 4.26
+      }
+    ]
+  },
+  "question-9": {
+    "id": "question-9",
+    "src": "/audio/question-9.mp3",
+    "text": "מה המסר של השיר? להיות חברים, לאהוב טבע או ליהנות?",
+    "duration": 5.27675,
+    "sha256": "99e4ea8d0ded10409b6c62f8d93cface2fe6a2ec2719d31f552985e50121101c",
+    "alignment": {
+      "method": "recording-forced-alignment",
+      "model": "faster-whisper 1.2.1 / Systran faster-whisper-small int8",
+      "review": "transcript-checked-against-source; physical-device-listening-pending"
+    },
+    "words": [
+      {
+        "word": "מה",
+        "start": 0.0,
+        "end": 0.46
+      },
+      {
+        "word": "המסר",
+        "start": 0.46,
+        "end": 0.88
+      },
+      {
+        "word": "של",
+        "start": 0.88,
+        "end": 1.06
+      },
+      {
+        "word": "השיר?",
+        "start": 1.06,
+        "end": 1.46
+      },
+      {
+        "word": "להיות",
+        "start": 1.9,
+        "end": 2.12
+      },
+      {
+        "word": "חברים,",
+        "start": 2.12,
+        "end": 2.64
+      },
+      {
+        "word": "לאהוב",
+        "start": 2.92,
+        "end": 3.58
+      },
+      {
+        "word": "טבע",
+        "start": 3.58,
+        "end": 3.9
+      },
+      {
+        "word": "או",
+        "start": 3.9,
+        "end": 4.36
+      },
+      {
+        "word": "ליהנות?",
+        "start": 4.36,
+        "end": 4.9
+      }
+    ]
+  },
+  "question-10": {
+    "id": "question-10",
+    "src": "/audio/question-10.mp3",
+    "text": "הוסיפו מילה קסומה לשיר. אפשר לבקש עזרה מהגננת.",
+    "duration": 4.6498125,
+    "sha256": "da8daefb78a676763002647bf7fb59c5d6167e1848caa4fa32b509822c4582f0",
+    "alignment": {
+      "method": "recording-forced-alignment",
+      "model": "faster-whisper 1.2.1 / Systran faster-whisper-small int8",
+      "review": "transcript-checked-against-source; physical-device-listening-pending"
+    },
+    "words": [
+      {
+        "word": "הוסיפו",
+        "start": 0.0,
+        "end": 0.8
+      },
+      {
+        "word": "מילה",
+        "start": 0.8,
+        "end": 1.08
+      },
+      {
+        "word": "קסומה",
+        "start": 1.08,
+        "end": 1.44
+      },
+      {
+        "word": "לשיר.",
+        "start": 1.44,
+        "end": 1.86
+      },
+      {
+        "word": "אפשר",
+        "start": 2.18,
+        "end": 2.82
+      },
+      {
+        "word": "לבקש",
+        "start": 2.82,
+        "end": 3.26
+      },
+      {
+        "word": "עזרה",
+        "start": 3.26,
+        "end": 3.6
+      },
+      {
+        "word": "מהגננת.",
+        "start": 3.6,
+        "end": 4.32
+      }
+    ]
+  },
+  "garden-hello-voice": {
+    "id": "garden-hello-voice",
+    "src": "/audio/garden-hello-voice.mp3",
+    "text": "בוקר של צלילים. בואו נקשיב, נמחא כפיים ונצטרף לקצב!",
+    "duration": 7.0008125,
+    "sha256": "3a926b75c6f86607e5f58c0a8eec009f5a8ce02c9b05044f10d66ed47153e4c6",
+    "alignment": {
+      "method": "recording-forced-alignment",
+      "model": "faster-whisper 1.2.1 / Systran faster-whisper-small int8",
+      "review": "transcript-checked-against-source; physical-device-listening-pending"
+    },
+    "words": [
+      {
+        "word": "בוקר",
+        "start": 0.0,
+        "end": 0.78
+      },
+      {
+        "word": "של",
+        "start": 0.78,
+        "end": 0.98
+      },
+      {
+        "word": "צלילים.",
+        "start": 0.98,
+        "end": 1.56
+      },
+      {
+        "word": "בואו",
+        "start": 2.04,
+        "end": 3.3
+      },
+      {
+        "word": "נקשיב,",
+        "start": 3.3,
+        "end": 3.8
+      },
+      {
+        "word": "נמחא",
+        "start": 4.22,
+        "end": 4.6
+      },
+      {
+        "word": "כפיים",
+        "start": 4.6,
+        "end": 5.04
+      },
+      {
+        "word": "ונצטרף",
+        "start": 5.04,
+        "end": 6.04
+      },
+      {
+        "word": "לקצב!",
+        "start": 6.04,
+        "end": 6.6
+      }
+    ]
+  },
+  "rain-dance-voice": {
+    "id": "rain-dance-voice",
+    "src": "/audio/rain-dance-voice.mp3",
+    "text": "טיפות רוקדות. איך נשמעות טיפות של גשם? בואו ננסה!",
+    "duration": 5.12,
+    "sha256": "caf8c5a145e94c862ab1a0e99d137ed7edb0d8d96fb6b511e19e0c23a396decb",
+    "alignment": {
+      "method": "recording-forced-alignment",
+      "model": "faster-whisper 1.2.1 / Systran faster-whisper-small int8",
+      "review": "transcript-checked-against-source; physical-device-listening-pending"
+    },
+    "words": [
+      {
+        "word": "טיפות",
+        "start": 0.0,
+        "end": 0.7
+      },
+      {
+        "word": "רוקדות.",
+        "start": 0.7,
+        "end": 1.24
+      },
+      {
+        "word": "איך",
+        "start": 1.66,
+        "end": 2.04
+      },
+      {
+        "word": "נשמעות",
+        "start": 2.04,
+        "end": 2.44
+      },
+      {
+        "word": "טיפות",
+        "start": 2.44,
+        "end": 2.8
+      },
+      {
+        "word": "של",
+        "start": 2.8,
+        "end": 2.94
+      },
+      {
+        "word": "גשם?",
+        "start": 2.94,
+        "end": 3.4
+      },
+      {
+        "word": "בואו",
+        "start": 3.82,
+        "end": 4.32
+      },
+      {
+        "word": "ננסה!",
+        "start": 4.32,
+        "end": 4.74
+      }
+    ]
+  },
+  "color-parade-voice": {
+    "id": "color-parade-voice",
+    "src": "/audio/color-parade-voice.mp3",
+    "text": "מצעד הצבעים. כל צבע מקבל צליל. בחרו צבע והצטרפו!",
+    "duration": 7.2881875,
+    "sha256": "415be43c2b3a2f9bcb5328b3c3cfb56b366b9cac029b36b57c467b16d09b759a",
+    "alignment": {
+      "method": "recording-forced-alignment",
+      "model": "faster-whisper 1.2.1 / Systran faster-whisper-small int8",
+      "review": "transcript-checked-against-source; physical-device-listening-pending"
+    },
+    "words": [
+      {
+        "word": "מצעד",
+        "start": 0.0,
+        "end": 0.8
+      },
+      {
+        "word": "הצבעים.",
+        "start": 0.8,
+        "end": 1.36
+      },
+      {
+        "word": "כל",
+        "start": 1.92,
+        "end": 2.82
+      },
+      {
+        "word": "צבע",
+        "start": 2.82,
+        "end": 3.26
+      },
+      {
+        "word": "מקבל",
+        "start": 3.26,
+        "end": 4.06
+      },
+      {
+        "word": "צליל.",
+        "start": 4.06,
+        "end": 4.5
+      },
+      {
+        "word": "בחרו",
+        "start": 4.94,
+        "end": 5.42
+      },
+      {
+        "word": "צבע",
+        "start": 5.42,
+        "end": 5.84
+      },
+      {
+        "word": "והצטרפו!",
+        "start": 5.84,
+        "end": 6.94
+      }
+    ]
+  }
+}

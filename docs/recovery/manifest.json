@@ -1,0 +1,292 @@
+{
+  "deploymentId": "dpl_3Mt95JP3Cd4obDongS2BRHrYqEAv",
+  "deploymentUrl": "https://habeat-shel-hagan-demo-2a9ppfyua-1002197961-3135s-projects.vercel.app",
+  "sourceBase": "614146d2cfd8d9893a14f64317349f0584fab053",
+  "recoveredAt": "2026-09-27",
+  "recoveredSource": [
+    "app/library/page.tsx",
+    "app/magic-song/page.tsx"
+  ],
+  "files": [
+    {
+      "path": "_next/static/chunks/255-d47fd57964443afe.js",
+      "bytes": 173611,
+      "sha256": "4a078cac7aeee0ac87e7b89fe80c7aec36f882b2511440468c95c9dbbcdbae49"
+    },
+    {
+      "path": "_next/static/chunks/486-4e48d852acd32d64.js",
+      "bytes": 109813,
+      "sha256": "28e80de0ffc7014b675c0b401ebedb991282ccd11518235550dea818e8ccb05c"
+    },
+    {
+      "path": "_next/static/chunks/4bd1b696-c023c6e3521b1417.js",
+      "bytes": 173019,
+      "sha256": "2c752a401191671d5bbbe7514f5828bbb0a7cc50bfbe77ddaf1b1ccba4412ed2"
+    },
+    {
+      "path": "_next/static/chunks/568-d05d0cf50993aaee.js",
+      "bytes": 7750,
+      "sha256": "ed1b37b4260a27067630bce174a48d89a16296dcd2929dc440039f56c5efddf8"
+    },
+    {
+      "path": "_next/static/chunks/619-ba102abea3e3d0e4.js",
+      "bytes": 8537,
+      "sha256": "9541ff3dd96091ca8bebc305fb72eca68e6015a177e1d3b4aa72859dc52fbdd7"
+    },
+    {
+      "path": "_next/static/chunks/app/beat-manager/loading-b1bd3fac4ced187c.js",
+      "bytes": 2650,
+      "sha256": "2653644061f89cf97a04e6368f08f5c750bfa29c41871ba8131e3c2ac02d6edc"
+    },
+    {
+      "path": "_next/static/chunks/app/beat-manager/page-9605ce00c82157fa.js",
+      "bytes": 27129,
+      "sha256": "37334cb79c24ff9f75447e361e6eee2f6186d4fd31c9c49678048a39f29c2075"
+    },
+    {
+      "path": "_next/static/chunks/app/behind-scenes/loading-b1bd3fac4ced187c.js",
+      "bytes": 2650,
+      "sha256": "2653644061f89cf97a04e6368f08f5c750bfa29c41871ba8131e3c2ac02d6edc"
+    },
+    {
+      "path": "_next/static/chunks/app/behind-scenes/page-64830c092e1251a1.js",
+      "bytes": 13351,
+      "sha256": "a46ee601c72715c7e2927a74597d988cc4c3145975f141e65ace49989524ae6b"
+    },
+    {
+      "path": "_next/static/chunks/app/dashboard/loading-b1bd3fac4ced187c.js",
+      "bytes": 2650,
+      "sha256": "2653644061f89cf97a04e6368f08f5c750bfa29c41871ba8131e3c2ac02d6edc"
+    },
+    {
+      "path": "_next/static/chunks/app/dashboard/page-b53e39fd6f8e4249.js",
+      "bytes": 10300,
+      "sha256": "6efedb95aeba9cf8885af987011f0e0ae75475c45b1bf320969acf785310e319"
+    },
+    {
+      "path": "_next/static/chunks/app/guide/page-b916f64bc73ad22e.js",
+      "bytes": 5230,
+      "sha256": "f48782391f2df675cfa1fad78664fdc9c4bef662cb7e44470808e9c7399fbe22"
+    },
+    {
+      "path": "_next/static/chunks/app/library/loading-b1bd3fac4ced187c.js",
+      "bytes": 2650,
+      "sha256": "2653644061f89cf97a04e6368f08f5c750bfa29c41871ba8131e3c2ac02d6edc"
+    },
+    {
+      "path": "_next/static/chunks/app/library/page-cd2e30580741d23c.js",
+      "bytes": 9138,
+      "sha256": "9cb48fe3c5bf44557c368318f6bc1a2bc2235e055bb78115912dedc08567f5a8"
+    },
+    {
+      "path": "_next/static/chunks/app/magic-song/loading-b1bd3fac4ced187c.js",
+      "bytes": 2650,
+      "sha256": "2653644061f89cf97a04e6368f08f5c750bfa29c41871ba8131e3c2ac02d6edc"
+    },
+    {
+      "path": "_next/static/chunks/app/magic-song/page-36ca99933c4ad303.js",
+      "bytes": 22037,
+      "sha256": "fd06b6759aaf51698a724f2eafb4883ac8d840ebbebdd465e088cef918fa1a44"
+    },
+    {
+      "path": "_next/static/chunks/app/page-f86621c7e1fa1c3e.js",
+      "bytes": 7872,
+      "sha256": "f0ef72cbc436dc9394e7fa2f8d6b7d7b8278562714f86ddfa6de5df848f99092"
+    },
+    {
+      "path": "_next/static/chunks/app/recording/loading-b1bd3fac4ced187c.js",
+      "bytes": 2650,
+      "sha256": "2653644061f89cf97a04e6368f08f5c750bfa29c41871ba8131e3c2ac02d6edc"
+    },
+    {
+      "path": "_next/static/chunks/app/recording/page-f7b149b59763252c.js",
+      "bytes": 8306,
+      "sha256": "bbdd53b8f32d5d291f2e6239ef147b9997d33cf6c3fe62db0bb052eb01bf8439"
+    },
+    {
+      "path": "_next/static/chunks/app/stations/loading-b1bd3fac4ced187c.js",
+      "bytes": 2650,
+      "sha256": "2653644061f89cf97a04e6368f08f5c750bfa29c41871ba8131e3c2ac02d6edc"
+    },
+    {
+      "path": "_next/static/chunks/app/stations/page-e10fe29dd579325e.js",
+      "bytes": 7141,
+      "sha256": "3d17ff211959f190c71e27d53ece290a3cb326404cd492819501ec43625e73e8"
+    },
+    {
+      "path": "_next/static/chunks/app/teacher/loading-b1bd3fac4ced187c.js",
+      "bytes": 2650,
+      "sha256": "2653644061f89cf97a04e6368f08f5c750bfa29c41871ba8131e3c2ac02d6edc"
+    },
+    {
+      "path": "_next/static/chunks/app/teacher/page-5003abe140575e2f.js",
+      "bytes": 8412,
+      "sha256": "96adf8a12bbab59793829f969e9c7e775458e6f5e573e0fdf103134d1c4ff885"
+    },
+    {
+      "path": "_next/static/chunks/app/template-84a3adca3820f548.js",
+      "bytes": 426,
+      "sha256": "5935e9111490e3be377df50c654d7f5b47088a04b76ca23a4e31f8d58e911d4b"
+    },
+    {
+      "path": "_next/static/chunks/main-app-8325d46b281e2127.js",
+      "bytes": 557,
+      "sha256": "ed3b79110ad5df855174484aac14fa9a3dc8ab156cca12e2c1b0067507248201"
+    },
+    {
+      "path": "_next/static/chunks/polyfills-42372ed130431b0a.js",
+      "bytes": 112594,
+      "sha256": "0973c1d64c88adc8e3c950410cb58b288f72118d5965b78049438deb8f2f9683"
+    },
+    {
+      "path": "_next/static/chunks/webpack-b5b4ecf69a86e80b.js",
+      "bytes": 3692,
+      "sha256": "c59bb5b9f0f7bf12b735a6268091f30a9949f11145d990cc00bff11272e59b30"
+    },
+    {
+      "path": "_next/static/css/2f153427e35fa355.css",
+      "bytes": 31845,
+      "sha256": "00a140f6ed19a335ac9c083de4e410e4cc478b68d0abbf2f71caa0d5c8785aa0"
+    },
+    {
+      "path": "_next/static/media/1ac0814e481b39bc-s.woff2",
+      "bytes": 14796,
+      "sha256": "54037b588f809fb7b07b74c8ba3c59668480bbf4473c53a11a4ed15a72a6bac3"
+    },
+    {
+      "path": "_next/static/media/70b9b96e99f02a56-s.woff2",
+      "bytes": 14244,
+      "sha256": "e9da7481ef83ad0f06e331f6022bb0a9e2ead0145468f5a26f2d2e0413e6a41a"
+    },
+    {
+      "path": "_next/static/media/806aa40678b0153b-s.woff2",
+      "bytes": 23772,
+      "sha256": "e453266d0aa8387d84c95d21601ac87d05d8166e363c3163aea490236f28f5c5"
+    },
+    {
+      "path": "_next/static/media/d2e3c073bbb3955e-s.p.woff2",
+      "bytes": 12000,
+      "sha256": "5272f40edeb1940202dd278d9121649047819a24b1cf0c8d8773f670f95f2596"
+    },
+    {
+      "path": "_next/static/media/ec516af01d950ed6-s.p.woff2",
+      "bytes": 30148,
+      "sha256": "5968ef50a00f549a771e975d978c22127bd00d170c2be85867bc72050b848071"
+    },
+    {
+      "path": "audio/color-parade-voice.mp3",
+      "bytes": 233221,
+      "sha256": "415be43c2b3a2f9bcb5328b3c3cfb56b366b9cac029b36b57c467b16d09b759a"
+    },
+    {
+      "path": "audio/garden-hello-voice.mp3",
+      "bytes": 224026,
+      "sha256": "3a926b75c6f86607e5f58c0a8eec009f5a8ce02c9b05044f10d66ed47153e4c6"
+    },
+    {
+      "path": "audio/question-1.mp3",
+      "bytes": 183902,
+      "sha256": "c31cb2bbcad47932b264d461e9b65974920547ea8bf01605fe28ca5c21f4eaf0"
+    },
+    {
+      "path": "audio/question-10.mp3",
+      "bytes": 148793,
+      "sha256": "da8daefb78a676763002647bf7fb59c5d6167e1848caa4fa32b509822c4582f0"
+    },
+    {
+      "path": "audio/question-2.mp3",
+      "bytes": 200620,
+      "sha256": "10f7b6d262da1d8c5c843899faab8ba2f490ede3f832e4edada06f80f13e2190"
+    },
+    {
+      "path": "audio/question-3.mp3",
+      "bytes": 149629,
+      "sha256": "8c292eec0c9731069bef5ca250d5f93acbea77d1a07b34d44deced428d1ab180"
+    },
+    {
+      "path": "audio/question-4.mp3",
+      "bytes": 164675,
+      "sha256": "e4e0ed5b4bd2168effe8d3865204782fcf6e25dae3bfee290d642c366cc645ee"
+    },
+    {
+      "path": "audio/question-5.mp3",
+      "bytes": 137926,
+      "sha256": "7d1430570709539b24f78f2734afa335a9f2b19f406304475637d18faaae6ad7"
+    },
+    {
+      "path": "audio/question-6.mp3",
+      "bytes": 158824,
+      "sha256": "930855bcdd11d79933a313aaea468f77098b8c53c737a77d12acf394b8321f43"
+    },
+    {
+      "path": "audio/question-7.mp3",
+      "bytes": 154644,
+      "sha256": "56b5cee993f220c0d49998798a13718e2799122b74b9d47d800f84267fa4dbf4"
+    },
+    {
+      "path": "audio/question-8.mp3",
+      "bytes": 147121,
+      "sha256": "b5639e477729f7c1b0dce4bfc572583871e7649311e61dd5d55ae3fd2a15aae7"
+    },
+    {
+      "path": "audio/question-9.mp3",
+      "bytes": 168855,
+      "sha256": "99e4ea8d0ded10409b6c62f8d93cface2fe6a2ec2719d31f552985e50121101c"
+    },
+    {
+      "path": "audio/rain-dance-voice.mp3",
+      "bytes": 163840,
+      "sha256": "caf8c5a145e94c862ab1a0e99d137ed7edb0d8d96fb6b511e19e0c23a396decb"
+    },
+    {
+      "path": "beat-manager",
+      "bytes": 15672,
+      "sha256": "1664c4c10e893622c54ee71678aa782f98bfcbb9584870a16511e091b81f8a32"
+    },
+    {
+      "path": "behind-scenes",
+      "bytes": 16922,
+      "sha256": "0dfe8e201bec200c66863410dcf1c8eed953d029e3b5a86e9aa92d1b35151aa2"
+    },
+    {
+      "path": "dashboard",
+      "bytes": 15066,
+      "sha256": "369d2739be41d1cbb5ffe09d30992599514d1789c1670b213cc27bd82588dcf1"
+    },
+    {
+      "path": "guide",
+      "bytes": 9243,
+      "sha256": "f0bfc7a2e3d8ca783d8ce941f60f913d164bc2e315d3b59b3c7e69bd309d6db0"
+    },
+    {
+      "path": "index.html",
+      "bytes": 19906,
+      "sha256": "538d293e444294fc4f481a1e239f03dfc9db65c189130fa4ad28fb94d009ecf9"
+    },
+    {
+      "path": "library",
+      "bytes": 11334,
+      "sha256": "69604abbeb2930eb1be852a946ab4f0e0660104cc63705b2f37e98af547c2779"
+    },
+    {
+      "path": "magic-song",
+      "bytes": 10708,
+      "sha256": "94355cc525fba312ea1d3802cf41b919fb36b895af7a8a0be3853c54e5824fcd"
+    },
+    {
+      "path": "recording",
+      "bytes": 9346,
+      "sha256": "773aa4ac0e35f8e7833d81f18827afb5d4cfcd29574b08018b6f7a828b5821ab"
+    },
+    {
+      "path": "stations",
+      "bytes": 24233,
+      "sha256": "1844f984fdd329553cecc41c1745154903a9b7f4094b7d2aba76e564e3e0b21e"
+    },
+    {
+      "path": "teacher",
+      "bytes": 18835,
+      "sha256": "ea86e42ea8916baae7ede536ca086eb58f0a8d20851c98b00ea674cb4acc5e7e"
+    }
+  ]
+}

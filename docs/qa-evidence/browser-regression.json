@@ -1,0 +1,48 @@
+[
+  {
+    "engine": "chromium",
+    "viewport": {
+      "width": 1280,
+      "height": 900
+    },
+    "status": "PASS",
+    "checks": [
+      "3 original score playback flows",
+      "13 narration loads",
+      "full Hebrew transcripts",
+      "media-clock highlight",
+      "seek",
+      "pause/resume",
+      "reset",
+      "repeat",
+      "rapid multiple clicks",
+      "navigation cleanup",
+      "lyrics-only output",
+      "RTL/no horizontal overflow",
+      "no page errors"
+    ]
+  },
+  {
+    "engine": "chromium-mobile",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "status": "PASS",
+    "checks": [
+      "3 original score playback flows",
+      "13 narration loads",
+      "full Hebrew transcripts",
+      "media-clock highlight",
+      "seek",
+      "pause/resume",
+      "reset",
+      "repeat",
+      "rapid multiple clicks",
+      "navigation cleanup",
+      "lyrics-only output",
+      "RTL/no horizontal overflow",
+      "no page errors"
+    ]
+  }
+]
