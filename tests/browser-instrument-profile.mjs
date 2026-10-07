@@ -15,6 +15,7 @@ await page.addInitScript(()=>{
 const base=process.env.PREVIEW_TEST_URL||'http://127.0.0.1:3010'
 await page.goto(base+'/turn-taking')
 await page.getByRole('button',{name:'הגדרות כלי למבוגר',exact:true}).click()
+ await page.getByLabel('אופן המשחק').selectOption('turns')
 await page.getByRole('button',{name:'בדקו כניסות קלט',exact:true}).click()
 await page.getByText(/כניסות שנמצאו/).waitFor()
 await page.evaluate(()=>window.__fixture.port.send(38))

@@ -45,9 +45,18 @@ test('all core states change only semantic SVG attributes, never geometry', () =
 
 test('turn feedback never invents success or Band Sync', () => {
   assert.equal(beatCoreStateForTurn('waiting'), 'listening')
-  assert.equal(beatCoreStateForTurn('demonstrating'), 'playing')
-  assert.equal(beatCoreStateForTurn('responded'), 'playing')
+  assert.equal(beatCoreStateForTurn('demonstrating', true), 'playing')
+  assert.equal(beatCoreStateForTurn('responded', true), 'playing')
+  assert.equal(beatCoreStateForTurn('demonstrating', false), 'listening')
+  assert.equal(beatCoreStateForTurn('responded', false), 'idle')
+  assert.equal(beatCoreStateForTurn('waiting', true), 'playing')
   for (const state of ['ready', 'paused', 'unknown']) assert.equal(beatCoreStateForTurn(state), 'idle')
+})
+
+test('completed turns cannot keep BeatCore playing after the tone ends', () => {
+  assert.equal(beatCoreStateForTurn('responded'), 'idle')
+  assert.equal(beatCoreStateForTurn('paused', true), 'idle')
+  assert.equal(beatCoreStateForTurn('ready', true), 'idle')
 })
 
 test('unrecognized runtime values cannot enter inline SVG markup', () => {

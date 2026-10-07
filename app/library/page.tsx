@@ -74,7 +74,7 @@ export default function LibraryPage() {
   return <AppShell bg="#f0f9ff">
     <BackHeader title="ספריית השירים 🎵" bg={BRAND.cyan} onBack={() => { stop(); narration.reset() }}/>
     <div className="p-4 space-y-4" dir="rtl">
-      <Link href="/guide" className="inline-block text-sm font-bold text-indigo-800">🎬 צפו בהדרכת הספרייה</Link>
+      <Link href="/guide" className="inline-flex min-h-12 items-center rounded-xl px-3 py-2 text-base font-bold text-indigo-800">🎬 צפו בהדרכת הספרייה</Link>
       <CharacterIntro character="G"><p className="text-sm text-slate-700 font-semibold">בחרו קטע, הקשיבו לצלילים והצטרפו לקצב. אפשר לשמוע שוב כמה שרוצים.</p></CharacterIntro>
       {source==='fallback' && <p className="text-sm text-amber-900 bg-amber-50 rounded-xl p-2">אין כרגע חיבור לקטלוג. שלושת קטעי ההתנסות זמינים במכשיר.</p>}
       {source==='live' && !catalog.length && <p role="status">עדיין אין שירים מאושרים להשמעה.</p>}

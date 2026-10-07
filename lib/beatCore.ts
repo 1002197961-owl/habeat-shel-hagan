@@ -19,10 +19,11 @@ export function beatCoreSvg(character: BeatCoreCharacter, state: BeatCoreState):
     .replace(/aria-label="[^"]*"/, `aria-label="${CHARACTER_LABELS[role]}: ${STATE_LABELS[safeState]}"`)
 }
 
-/** Receiving the requested input is not evidence of rhythmic correctness. */
-export function beatCoreStateForTurn(turn: string): BeatCoreState {
-  if (turn === 'waiting') return 'listening'
-  if (turn === 'demonstrating' || turn === 'responded') return 'playing'
+/** A completed turn is neither ongoing sound nor evidence of rhythmic correctness. */
+export function beatCoreStateForTurn(turn: string, toneActive = false): BeatCoreState {
+  if (!['waiting', 'demonstrating', 'responded'].includes(turn)) return 'idle'
+  if (toneActive) return 'playing'
+  if (turn === 'waiting' || turn === 'demonstrating') return 'listening'
   return 'idle'
 }
 

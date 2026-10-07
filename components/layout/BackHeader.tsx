@@ -26,7 +26,7 @@ export function BackHeader({
         href={backHref}
         onClick={onBack}
         aria-label="חזרה"
-        className="flex items-center justify-center w-9 h-9 rounded-[10px] text-white text-lg flex-shrink-0 no-underline"
+        className="flex items-center justify-center w-12 h-12 rounded-[10px] text-white text-lg flex-shrink-0 no-underline"
         style={{ background: 'rgba(255,255,255,0.25)' }}
       >
         <PilotIcon name="back" size={28} />

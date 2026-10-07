@@ -38,9 +38,14 @@ for(const [engine,type,viewport] of [ ['chromium',chromium,{width:1280,height:90
  }
  await page.getByRole('link',{name:'חזרה',exact:true}).click()
  await page.getByRole('link',{name:/שיר הקסם/}).click()
+ assert.ok(await page.getByRole('link',{name:'חזרה',exact:true}).evaluate(el=>{const r=el.getBoundingClientRect();return r.width>=48&&r.height>=48}))
  for(let q=1;q<=10;q++) {
    const reader=page.locator(`[data-narration="question-${q}"]`)
    await reader.waitFor()
+   if(q<10) {
+     await page.waitForTimeout(500)
+     assert.ok(await page.locator('[data-question-option]').evaluateAll(nodes=>nodes.length===3&&nodes.every(el=>{const r=el.getBoundingClientRect();return r.top>=0&&r.bottom<=innerHeight&&r.height>=48})),`${engine}: all three answers visible without scrolling on question ${q}`)
+   }
    assert.equal(await reader.locator('[data-transcript]').textContent(),assets[`question-${q}`].text)
    await reader.getByRole('button',{name:`הקרא שוב: שאלה ${q}`,exact:true}).click()
    await page.waitForFunction(()=>window.__audio.some(a=>!a.paused&&a.currentTime>.1))
@@ -61,6 +66,10 @@ for(const [engine,type,viewport] of [ ['chromium',chromium,{width:1280,height:90
      await page.waitForFunction(()=>window.__audio.filter(a=>!a.paused).length===1)
    }
    if(q<10){
+     await reader.getByRole('button',{name:'עצירה',exact:true}).click()
+     assert.equal(await reader.getByRole('button').count(),3,`${engine}: paused question ${q} keeps one compact control row`)
+     assert.ok(await page.locator('[data-question-option]').evaluateAll(nodes=>nodes.length===3&&nodes.every(el=>{const r=el.getBoundingClientRect();return r.top>=0&&r.bottom<=innerHeight})),`${engine}: all answers remain visible while question ${q} narration is paused`)
+     await reader.getByRole('button',{name:'המשך הקראה',exact:true}).click()
      const option=page.locator('[role="button"]').first()
      // Duplicate clicks within one transition must advance only one question.
      await option.evaluate(el=>{el.click();el.click();el.click()})

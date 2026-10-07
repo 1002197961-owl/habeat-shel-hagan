@@ -132,7 +132,7 @@ export default function MagicSongPage() {
     return (
       <AppShell bg="#fffbeb">
         <BackHeader title="שיר הקסם ⭐" bg={BRAND.orange} onBack={() => { clearTransition(); narration.reset(); stopSpeech() }} />
-      <div className="px-4 pt-3"><Link href="/guide" className="inline-block rounded-xl bg-white px-3 py-2 text-sm font-bold text-indigo-800 shadow-sm">🎬 איך יוצרים שיר?</Link></div>
+      <div className="px-4 pt-3"><Link href="/guide" className="inline-flex min-h-12 items-center rounded-xl bg-white px-3 py-2 text-base font-bold text-indigo-800 shadow-sm">🎬 איך יוצרים שיר?</Link></div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '70vh', gap: 20 }}>
           <CharacterCompanions characters={['M']} height={104} />
           <motion.div animate={{ rotate: 360 }} transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }} style={{ fontSize: 64 }}>✨</motion.div>
@@ -194,8 +194,8 @@ export default function MagicSongPage() {
   return (
     <AppShell bg="#fffbeb">
       <BackHeader title="שיר הקסם ⭐" bg={BRAND.orange} onBack={() => { clearTransition(); narration.reset(); stopSpeech() }} />
-      <div className="p-4 space-y-4">
-        <div className="rounded-2xl bg-white p-2"><CharacterCompanions characters={['M']} height={72} /></div>
+      <div className="p-3 space-y-3" data-magic-questions>
+        <div className="rounded-2xl bg-white p-1"><CharacterCompanions characters={['M']} height={56} /></div>
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.05 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
             <span style={{ fontSize: 12, fontWeight: 700, color: '#9ca3af' }}>שאלה {qIdx + 1} מתוך {totalQ}</span>
@@ -210,11 +210,15 @@ export default function MagicSongPage() {
         <AnimatePresence mode="wait">
           <motion.div key={qIdx} initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -30 }} transition={{ duration: 0.25 }}>
-            <Card style={{ textAlign: 'center', padding: '22px 18px', background: `linear-gradient(135deg,${BRAND.yellow}33,${BRAND.orange}18)` }}>
-              <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 2, repeat: Infinity }} style={{ fontSize: 52, marginBottom: 10 }}>{q.emoji}</motion.div>
-              <div className="font-black" style={{ fontSize: 20, color: BRAND.navy, marginBottom: 4 }}>{q.q}</div>
-              <div style={{ fontSize: 13, color: '#6b7280' }}><PilotIcon name="hint" size={22} /> {q.hint}</div>
-              <NarrationReader key={qIdx} asset={NARRATION[`question-${qIdx + 1}`]} player={narration} label={`שאלה ${qIdx + 1}`} beforePlay={stopSpeech}/>
+            <Card style={{ textAlign: 'center', padding: '12px', background: `linear-gradient(135deg,${BRAND.yellow}33,${BRAND.orange}18)` }}>
+              <div className="flex items-center justify-center gap-3">
+                <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 2, repeat: Infinity }} style={{ fontSize: 36 }}>{q.emoji}</motion.div>
+                <div>
+                  <div className="font-black" style={{ fontSize: 20, color: BRAND.navy, marginBottom: 4 }}>{q.q}</div>
+                  <div style={{ fontSize: 13, color: '#6b7280' }}><PilotIcon name="hint" size={22} /> {q.hint}</div>
+                </div>
+              </div>
+              <NarrationReader key={qIdx} asset={NARRATION[`question-${qIdx + 1}`]} player={narration} label={`שאלה ${qIdx + 1}`} beforePlay={stopSpeech} compact/>
             </Card>
           </motion.div>
         </AnimatePresence>
@@ -244,13 +248,13 @@ export default function MagicSongPage() {
                   const colors = [BRAND.pink, BRAND.cyan, BRAND.green]
                   const c = colors[i]
                   return (
-                    <motion.div key={opt.l} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                    <motion.div key={opt.l} data-question-option initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.08 }} whileTap={{ scale: 0.97 }} role="button" tabIndex={0} aria-label={opt.l} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectAnswer(opt.l) } }} onClick={() => selectAnswer(opt.l)}>
                       <Card style={{ cursor: 'pointer', background: isSelected ? `${c}22` : 'white',
                         border: `2.5px solid ${isSelected ? c : '#e5e7eb'}`,
                         boxShadow: isSelected ? `0 4px 20px ${c}33` : undefined,
-                        transition: 'all 0.18s', padding: '16px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
-                        <motion.span style={{ fontSize: 40 }} animate={isSelected ? { scale: [1, 1.2, 1] } : {}} transition={{ duration: 0.3 }}>{opt.e}</motion.span>
+                        transition: 'all 0.18s', padding: '10px 14px', minHeight: 64, display: 'flex', alignItems: 'center', gap: 14 }}>
+                        <motion.span style={{ fontSize: 32 }} animate={isSelected ? { scale: [1, 1.2, 1] } : {}} transition={{ duration: 0.3 }}>{opt.e}</motion.span>
                         <span className="font-black" style={{ fontSize: 18, color: isSelected ? c : BRAND.navy }}>{opt.l}</span>
                         {isSelected && (
                           <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}

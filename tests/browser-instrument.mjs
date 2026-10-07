@@ -35,6 +35,7 @@ for(const viewport of [{width:1280,height:900},{width:390,height:844}]){
  await page.waitForFunction(()=>{const images=[...document.querySelectorAll('[data-pilot-icon]')];return images.length>=4&&images.every(image=>image.complete&&image.naturalWidth>0)})
  assert.equal(await page.getByRole('button',{name:'בדקו כניסות קלט',exact:true}).count(),0)
  await page.getByRole('button',{name:'הגדרות כלי למבוגר',exact:true}).click()
+ await page.getByLabel('אופן המשחק').selectOption('turns')
  await page.getByText('Web MIDI זמין לבקשת הרשאה',{exact:true}).waitFor()
  assert.equal(await page.evaluate(()=>window.__fixture.requests),0)
  await page.getByRole('button',{name:'בדקו כניסות קלט',exact:true}).click()
@@ -53,13 +54,29 @@ for(const viewport of [{width:1280,height:900},{width:390,height:844}]){
  await page.getByText('אבחון ושמירת דוח למבוגר',{exact:true}).click()
  await page.evaluate(()=>{const p=window.__fixture.port,t=performance.now();p.send([153,39,100],t);p.send([153,38,0],t+0.1)})
  assert.equal(await page.locator('[data-turn="waiting"]').count(),1)
- await page.evaluate(()=>{const p=window.__fixture.port,t=performance.now();p.send([153,38,100],t);p.send([153,38,100],t);p.send([153,38,100],t+0.01)})
+ await page.evaluate(()=>{
+  // Record the short playing state in-page, before CDP can miss the 240ms tone.
+  window.__corePlayedWithTone=false
+  const core=document.querySelector('[data-beat-core]')
+  const observer=new MutationObserver(()=>{
+   if(window.__activeTurnTones.size>0&&core.dataset.coreState==='playing'){
+    window.__corePlayedWithTone=true;observer.disconnect()
+   }
+  })
+  observer.observe(core,{attributes:true,attributeFilter:['data-core-state']})
+  const p=window.__fixture.port,t=performance.now();p.send([153,38,100],t);p.send([153,38,100],t);p.send([153,38,100],t+0.01)
+ })
+ await page.waitForFunction(()=>window.__corePlayedWithTone)
  await page.locator('[data-turn="responded"]').waitFor()
+ await page.waitForFunction(()=>window.__activeTurnTones.size===0)
+ await page.locator('[data-beat-core] svg[data-state="idle"]').waitFor()
+ assert.equal(await page.locator('[data-turn="responded"]').count(),1)
  await page.getByText(/תגובות במשחק: 1 · מסירות זהות שסוננו: 1/).waitFor()
  await page.getByRole('button',{name:'שמעו שוב והתחילו',exact:true}).click()
  await page.locator('[data-turn="waiting"]').waitFor()
  await page.evaluate(()=>window.__fixture.change(false))
  await page.locator('[data-turn="paused"]').waitFor()
+ assert.equal(await page.locator('[data-beat-core] svg[data-state="playing"]').count(),0)
  await page.evaluate(()=>{window.__fixture.port.send([153,38,100]);window.__fixture.change(true)})
  assert.equal(await page.locator('[data-turn="paused"]').count(),1)
  await page.getByRole('button',{name:'שמעו שוב והתחילו',exact:true}).click()
@@ -91,6 +108,7 @@ for(const viewport of [{width:1280,height:900},{width:390,height:844}]){
  await page.getByRole('button',{name:'שמעו שוב והתחילו',exact:true}).click()
  await page.getByRole('button',{name:'עצירה',exact:true}).click()
  await page.waitForTimeout(1400);assert.equal(await page.locator('[data-turn="paused"]').count(),1)
+ assert.equal(await page.locator('[data-beat-core] svg[data-state="playing"]').count(),0)
  assert.equal(await page.evaluate(()=>window.__activeTurnTones.size),0)
  await page.getByRole('link',{name:'חזרה למצב גננת',exact:true}).click();await page.waitForURL('**/teacher')
  assert.deepEqual(errors,[])

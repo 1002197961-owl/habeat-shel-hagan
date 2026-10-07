@@ -37,3 +37,21 @@ test('suspended audio is rejected instead of claiming audible feedback',async()=
  await assert.rejects(tone.prepare(),/Audio unavailable/)
  assert.equal(tone.play(),null);assert.equal(contexts[0].nodes.length,0);tone.dispose()
 })
+
+test('tone activity ends on the final oscillator end, including overlapping inputs',async()=>{
+ const contexts=installAudioFixture(),activity=[],tone=new TurnTone(active=>activity.push(active))
+ await tone.prepare();tone.play();tone.play()
+ assert.equal(activity.at(-1),true)
+ contexts[0].nodes[0].onended();assert.equal(activity.at(-1),true)
+ contexts[0].nodes[1].onended();assert.equal(activity.at(-1),false)
+ tone.dispose()
+})
+
+test('stop resets tone activity immediately and late ended events cannot stop a newer tone',async()=>{
+ const contexts=installAudioFixture(),activity=[],tone=new TurnTone(active=>activity.push(active))
+ await tone.prepare();tone.play();const old=contexts[0].nodes[0]
+ tone.stop();assert.equal(activity.at(-1),false)
+ tone.play();assert.equal(activity.at(-1),true)
+ old.onended();assert.equal(activity.at(-1),true)
+ tone.dispose();assert.equal(activity.at(-1),false)
+})

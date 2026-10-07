@@ -65,7 +65,7 @@ export default function RecordingPage() {
 
   return <AppShell bg="#fff8f0">
     <BackHeader title="אולפן הקלטה 🎤" bg={BRAND.orange} />
-      <div className="px-4 pt-3"><Link href="/guide" className="inline-block rounded-xl bg-white px-3 py-2 text-sm font-bold text-indigo-800 shadow-sm">🎬 איך מקליטים?</Link></div>
+      <div className="px-4 pt-3"><Link href="/guide" className="inline-flex min-h-12 items-center rounded-xl bg-white px-3 py-2 text-base font-bold text-indigo-800 shadow-sm">🎬 איך מקליטים?</Link></div>
     <div className="p-4 space-y-4" dir="rtl">
       <CharacterIntro character="M"><p className="text-sm text-slate-700">בחרו הקלטת קול או צילום קליפ, אשרו גישה למכשיר, ואז לחצו על התחלה. בקשו עזרה מגננת לפני שמצלמים ילדים.</p></CharacterIntro>
       <div className="flex gap-2">

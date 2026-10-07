@@ -3,7 +3,7 @@ export const BRAND = {
 } as const
 export type BrandColor = keyof typeof BRAND
 export const NAV_SCREENS = [
- {id:'turn-taking',href:'/turn-taking',label:'התור שלי, התור שלך',emoji:'🥁',gradient:'linear-gradient(135deg,#00B4E6,#0096c7)',color:'#00B4E6',bg:'#f0f9ff'},
+ {id:'turn-taking',href:'/turn-taking',label:'מנגנים עם הלהקה',emoji:'🥁',gradient:'linear-gradient(135deg,#00B4E6,#0096c7)',color:'#00B4E6',bg:'#f0f9ff'},
  {id:'magic-song',href:'/magic-song',label:'שיר הקסם',emoji:'⭐',gradient:'linear-gradient(135deg,#FFD600,#FFA500)',color:'#FFD600',bg:'#fffbeb'},
  {id:'library',href:'/library',label:'ספריית שירים',emoji:'📂',gradient:'linear-gradient(135deg,#22C55E,#15803d)',color:'#22C55E',bg:'#f0fdf4'},
  {id:'recording',href:'/recording',label:'הקלטה',emoji:'🎤',gradient:'linear-gradient(135deg,#FFA500,#d45500)',color:'#FFA500',bg:'#fff8f0'},

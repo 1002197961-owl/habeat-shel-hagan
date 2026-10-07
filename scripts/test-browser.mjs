@@ -15,7 +15,7 @@ const server=createServer(async(req,res)=>{
 })
 if(!process.env.PREVIEW_TEST_URL){await new Promise(r=>server.listen(0,'127.0.0.1',r));process.env.PREVIEW_TEST_URL=`http://127.0.0.1:${server.address().port}`}
 try {
- for(const script of (process.argv.includes('--characters-only') ? ['tests/browser-characters.mjs'] : process.argv.includes('--capture-only') ? ['scripts/capture-screens.mjs'] : ['tests/browser-regression.mjs','tests/browser-instrument.mjs','tests/browser-instrument-profile.mjs','tests/browser-characters.mjs'])) {
+ for(const script of (process.argv.includes('--characters-only') ? ['tests/browser-characters.mjs'] : process.argv.includes('--capture-only') ? ['scripts/capture-screens.mjs'] : ['tests/browser-regression.mjs','tests/browser-instrument.mjs','tests/browser-instrument-profile.mjs','tests/browser-sequence.mjs','tests/browser-characters.mjs'])) {
   const result=await new Promise(resolve=>{const child=spawn(process.execPath,[script],{stdio:'inherit',env:process.env});child.on('exit',resolve)})
   if(result!==0){process.exitCode=result||1;break}
  }
