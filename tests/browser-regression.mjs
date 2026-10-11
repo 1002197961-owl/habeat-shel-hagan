@@ -100,6 +100,7 @@ for(const [engine,type,viewport] of [ ['chromium',chromium,{width:1280,height:90
  await page.getByRole('button',{name:'צרו מילים לשיר חדש',exact:true}).click()
  await page.getByRole('button',{name:'הקרא שוב: שאלה 1',exact:true}).click()
  await page.getByRole('link',{name:'חזרה',exact:true}).click()
+ await page.waitForURL(base+'/')
  assert.ok(await page.evaluate(()=>window.__audio.every(a=>a.paused)))
  // Route exits preserve navigation and expose no runtime exceptions.
  for(const path of ['/guide','/recording','/beat-manager','/teacher','/stations','/dashboard','/behind-scenes']){
