@@ -55,3 +55,17 @@ test('stop resets tone activity immediately and late ended events cannot stop a 
  old.onended();assert.equal(activity.at(-1),true)
  tone.dispose();assert.equal(activity.at(-1),false)
 })
+
+test('a musical bar is scheduled on the audio clock; stop cancels future notes',async()=>{
+ const contexts=installAudioFixture(),activity=[],tone=new TurnTone(active=>activity.push(active))
+ await tone.prepare()
+ const start=tone.clock+0.08
+ for(const offset of [0,0.9,1.35])tone.play(start+offset)
+ assert.deepEqual(contexts[0].nodes.map(n=>n.starts[0]),[1.08,1.98,2.43])
+ assert.equal(activity.includes(true),false,'future notes must not light the current cue')
+ tone.stop()
+ assert.ok(contexts[0].nodes.every(n=>n.stops.length===2))
+ await new Promise(resolve=>setTimeout(resolve,100))
+ assert.equal(activity.includes(true),false,'cancelled activity timers cannot fire')
+ tone.dispose()
+})

@@ -1,45 +1,44 @@
-// All messages and identities below are SOFTWARE FIXTURES, never hardware evidence.
-import {chromium} from 'playwright'
 import assert from 'node:assert/strict'
-const browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_EXECUTABLE,args:['--no-sandbox']})
-const page=await browser.newPage({viewport:{width:390,height:844}})
-await page.addInitScript(()=>{
- class Port extends EventTarget {
-  id='MULTIPAD-SOFTWARE-FIXTURE';name='SOFTWARE FIXTURE';manufacturer='TEST';state='connected'
-  open(){return Promise.resolve(this)} close(){return Promise.resolve(this)}
-  send(note){const e=new Event('midimessage');Object.defineProperties(e,{data:{value:new Uint8Array([153,note,90])},timeStamp:{value:performance.now()}});this.dispatchEvent(e)}
- }
- const port=new Port(),access=new EventTarget();access.inputs=new Map([[port.id,port]])
- window.__fixture={port,access};Object.defineProperty(navigator,'requestMIDIAccess',{value:async()=>access})
-})
-const base=process.env.PREVIEW_TEST_URL||'http://127.0.0.1:3010'
-await page.goto(base+'/turn-taking')
-await page.getByRole('button',{name:'הגדרות כלי למבוגר',exact:true}).click()
- await page.getByLabel('אופן המשחק').selectOption('turns')
-await page.getByRole('button',{name:'בדקו כניסות קלט',exact:true}).click()
-await page.getByText(/כניסות שנמצאו/).waitFor()
-await page.evaluate(()=>window.__fixture.port.send(38))
-await page.getByRole('button',{name:'מפו את התו האחרון למשחק'}).click()
-await page.getByLabel('הפד שמכוונים').selectOption('blue')
-await page.evaluate(()=>window.__fixture.port.send(43))
-await page.getByRole('button',{name:'מפו את התו האחרון למשחק'}).click()
-assert.equal(await page.locator('[data-target-pad="blue"]').count(),1)
-assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('habeat.instrument-profile.v1')).pads.length),2)
-await page.getByRole('button',{name:'סיימנו לכוון, חוזרים למשחק',exact:true}).click()
-await page.getByRole('button',{name:'התחילו',exact:true}).click()
-await page.locator('[data-turn="waiting"]').waitFor()
-await page.evaluate(()=>window.__fixture.port.send(38))
-await page.locator('[data-character-response="playing"]').waitFor()
-assert.equal(await page.locator('[data-turn="waiting"]').count(),1)
-await page.evaluate(()=>window.__fixture.port.send(43))
-await page.locator('[data-turn="responded"]').waitFor()
-assert.equal(await page.locator('[data-character-response]').getAttribute('data-response-event-id'),await page.locator('[data-action-progress]').getAttribute('data-game-response-id'))
-await page.reload()
-await page.getByRole('button',{name:'הגדרות כלי למבוגר',exact:true}).click()
-await page.getByRole('button',{name:'בדקו כניסות קלט',exact:true}).click()
-await page.getByText(/הכלי המוכר זוהה/).waitFor()
-assert.equal(await page.getByLabel('הפד למשחק').locator('option').count(),2)
-assert.equal(await page.getByRole('button',{name:'התחילו',exact:true}).isEnabled(),true)
-assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true)
-await browser.close()
-console.log('PASS multi-pad software fixture: learned pads, visible target, wrong-pad feedback without completion, accepted input character event, persistence/reconnect, mobile width; NOT a hardware test')
+import {launch,fixture,button,connect,noScroll,calibrate,send,close} from './turn-browser-fixture.mjs'
+const browser=await launch()
+try {
+ const page=await browser.newPage({viewport:{width:360,height:640}})
+ await fixture(page)
+ // The primary action is useful even before a drum is connected.
+ await button(page,'התחילו').click();await page.getByRole('dialog').waitFor()
+ await button(page,'חיבור התופים').click();await button(page,'הבא — כיוון הפדים').click();await noScroll(page)
+ assert.equal(await page.evaluate(()=>document.activeElement.id),'setup-title')
+ await send(page,38) // unarmed input must not assign a colour
+ assert.equal(await page.evaluate(()=>localStorage.getItem('habeat.instrument-profile.v1')),null)
+ await calibrate(page,'blue','תכלת 1 — שמאל חיצוני',38)
+ await button(page,'הבא — למשחק').click();await noScroll(page)
+ assert.ok(await page.getByLabel('רמת פתיחה').locator('option[value="3"]').isDisabled())
+ await button(page,'כיוון פדים').click()
+ await button(page,'כיוון סגול — למטה ימין').click();await send(page,38)
+ await page.getByRole('alert').waitFor()
+ assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('habeat.instrument-profile.v1')).pads.length),1)
+ await calibrate(page,'purple','סגול — למטה ימין',43)
+ await calibrate(page,'green','ירוק — אמצע שמאל',46)
+ await button(page,'הבא — למשחק').click()
+ await page.getByLabel('רמת פתיחה').selectOption('3')
+ await page.getByLabel('מהירות ההדגמה').selectOption('650');await close(page)
+ await button(page,'התחילו').click();await page.locator('[data-turn="waiting"]').waitFor()
+ assert.deepEqual(await page.locator('[data-sequence-step]').evaluateAll(nodes=>nodes.map(n=>n.dataset.sequencePad)),['blue','purple','green'])
+ for(const n of [38,43,46])await send(page,n)
+ await page.locator('[data-turn="responded"]').waitFor();await noScroll(page)
+ await page.reload();await connect(page)
+ await button(page,'הכיוון נשמר — ממשיכים').click()
+ await button(page,'פדים למשחק').click();assert.equal(await page.getByRole('checkbox',{checked:true}).count(),3);await noScroll(page)
+ await button(page,'חזרה להגדרות המשחק').click();await button(page,'כלי וגיבוי').click();await noScroll(page)
+ // A different port identity cannot silently inherit a profile.
+ await page.getByLabel('ייבוא כיוון מגן אחר').setInputFiles({name:'different.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify({version:1,port:{id:'DIFFERENT',name:'OTHER',manufacturer:'TEST'},pads:[{id:'blue',channel:10,note:50}]}))})
+ await page.getByText(/הפרופיל יובא/).waitFor()
+ await button(page,'חיבור כלי MIDI').click();await button(page,'חיבור התופים').click()
+ const confirm=button(page,'אישור מבוגר: התאימו פרופיל ל־SOFTWARE FIXTURE');await confirm.waitFor()
+ page.once('dialog',d=>d.accept());await confirm.click();await button(page,'הכיוון נשמר — ממשיכים').click()
+ assert.ok(await page.getByLabel('רמת פתיחה').locator('option[value="3"]').isDisabled())
+ // Native modal traps keyboard focus and Escape returns focus to its opener.
+ await page.keyboard.press('Tab');assert.ok(await page.evaluate(()=>document.querySelector('dialog').contains(document.activeElement)))
+ await page.keyboard.press('Escape');assert.equal(await page.getByRole('dialog').count(),0)
+ console.log('PASS automatic calibration, stale-input exclusion, duplicate rejection, three colours, saved profile, import/identity approval, modal keyboard, single-pad level guard; software only.')
+} finally {await browser.close()}

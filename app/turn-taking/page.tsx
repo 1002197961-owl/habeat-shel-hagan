@@ -1,5 +1,6 @@
 'use client'
 import Link from 'next/link'
+import './turn-taking.css'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { BRAND } from '@/lib/constants'
 import { InputRecorder, MidiTransport, routeInput, type InputEvent, type InputPort, type Mapping, type MidiAccessLike, type Turn } from '@/lib/instrumentInput'
@@ -52,6 +53,17 @@ export default function TurnTakingPage() {
   const [capability, setCapability] = useState('טרם נבדק')
   const [busy, setBusy] = useState(false)
   const [setupOpen, setSetupOpen] = useState(false)
+  const [setupStep, setSetupStep] = useState<'connect' | 'calibrate' | 'options' | 'pads' | 'backup' | 'report' | 'log'>('connect')
+  const [armed, setArmed] = useState(false)
+  const [logPage, setLogPage] = useState(0)
+  const dialog = useRef<HTMLDialogElement>(null)
+  useEffect(() => {
+    if (setupOpen) dialog.current?.showModal(); else dialog.current?.close()
+  }, [setupOpen])
+  useEffect(() => {
+    setArmed(false)
+    if (setupOpen) dialog.current?.querySelector<HTMLElement>('h2')?.focus()
+  }, [setupStep, setupOpen])
   const [captureSince, setCaptureSince] = useState(0)
   const [lastAccepted, setLastAccepted] = useState<number | null>(null)
   const [lastGameEventId, setLastGameEventId] = useState<number | null>(null)
@@ -160,7 +172,7 @@ export default function TurnTakingPage() {
       setPorts(next)
       const matched = matchProfile(profileRef.current, next)
       const restored = mappingFor(profileRef.current, matched, selectedPadRef.current)
-      if (restored) { state.current.mapping = restored; setMapping(restored); setProfileStatus('הכלי המוכר זוהה — הכיוון השמור נטען') }
+      if (restored) { state.current.mapping = restored; setMapping(restored); setProfileStatus('הכלי המוכר זוהה — הכיוון השמור נטען'); setError(previous => previous.startsWith('הכלי נותק') ? '' : previous) }
       setConnections(previous => [{ at: new Date().toISOString(), ports: next }, ...previous].slice(0, 100))
       if (state.current.mode === 'web-midi' && state.current.mapping && !restored) {
         stop(); state.current.mapping = null; setMapping(null); setCaptureSince(performance.now()); setError('הכלי נותק. חברו מחדש והתחילו סבב חדש כשאתם מוכנים.')
@@ -197,37 +209,44 @@ export default function TurnTakingPage() {
   }
   const ready = mode === 'simulation' || !!(mapping && ports.some(p => p.id === mapping.portId))
   const availablePads = mode === 'simulation' ? SIM_PADS.map(p => p.id) : profile?.pads.map(p => p.id) || []
-  const gamePads = chosenPads === null ? availablePads.slice(0, 3) : availablePads.filter(id => chosenPads.includes(id)).slice(0, 3)
+  const gamePads = chosenPads === null ? availablePads : chosenPads.filter(id => availablePads.includes(id))
+  const openSetup = (step: typeof setupStep = ready ? 'options' : 'connect') => { stop('ready'); setSetupStep(step); setSetupOpen(true) }
   const start = async (levelOverride?: number) => {
+    const previousRound = roundRef.current
     stop('ready'); setError('')
-    if (!ready) return
+    if (!ready) { openSetup('connect'); return }
+    const level = levelOverride ?? sequenceLevel
+    if (gameModeRef.current === 'sequence' && gamePads.length < level) { setError(`לרצף הזה צריך ${level} פדים שונים. כוונו עוד פד או בחרו רמה קצרה יותר.`); openSetup('calibrate'); return }
     if (gameModeRef.current === 'sequence' && !gamePads.length) { setError('בחרו לפחות פד מכויל אחד למשחק.'); return }
     const request = generation.current; setBusy(true)
     try {
-      const nextRound = gameModeRef.current === 'sequence' ? createSequenceRound(++roundCounter.current, gamePads, levelOverride ?? sequenceLevel) : null
+      const nextRound = gameModeRef.current === 'sequence' ? previousRound && levelOverride === undefined && previousRound.level === level && previousRound.pads.every(id => gamePads.includes(id))
+        ? { ...previousRound, id: ++roundCounter.current, index: 0, phase: 'demonstrating' as const, mistakes: 0, lastEventId: null }
+        : createSequenceRound(++roundCounter.current, gamePads, level) : null
       await tone.current!.prepare()
       if (request !== generation.current) return
       setBusy(false); state.current.turn = 'demonstrating'; setTurn('demonstrating')
       if (nextRound) {
         setSequenceLevel(nextRound.level); updateRound(nextRound); setSetupOpen(false)
         const schedule = sequenceDemoSchedule(nextRound.pads.length, demoTempo)
+        const audioStart = tone.current!.clock + 0.08
         for (const step of schedule.steps) {
+          const audio = tone.current!.play(audioStart + step.atMs / 1000)
+          if (!audio) { stop(); setError('השמע נעצר. התחילו שוב.'); return }
+          demoLog.current = [...demoLog.current, {roundId:nextRound.id,step:step.index + 1,padId:nextRound.pads[step.index],scheduledAtMs:audio.scheduledAtMs}].slice(-1000)
           const demonstrate = () => {
             if (request !== generation.current) return
             const id = nextRound.pads[step.index]
             setDemoIndex(step.index); applyTargetPad(id)
-            const audio = tone.current!.play()
-            if (!audio) { stop(); setError('השמע נעצר. בדקו את האוזניות והתחילו את הרצף שוב.'); return }
-            if (audio) demoLog.current = [...demoLog.current, {roundId:nextRound.id,step:step.index + 1,padId:id,scheduledAtMs:audio.scheduledAtMs}].slice(-1000)
+            timers.current.push(setTimeout(() => { if (request === generation.current) setDemoIndex(null) }, 240))
           }
-          if (step.atMs === 0) demonstrate()
-          else timers.current.push(setTimeout(demonstrate, step.atMs))
+          timers.current.push(setTimeout(demonstrate, step.atMs + 80))
         }
         timers.current.push(setTimeout(() => {
           if (request !== generation.current) return
           setDemoIndex(null); updateRound(beginSequenceResponse(nextRound)); applyTargetPad(nextRound.pads[0])
           state.current.waitingSince = performance.now(); state.current.turn = 'waiting'; setTurn('waiting')
-        }, schedule.responseAtMs))
+        }, schedule.responseAtMs + 80))
         return
       }
       tone.current!.play()
@@ -266,6 +285,12 @@ export default function TurnTakingPage() {
       saveProfile(next); setError(''); selectPad(learnSlot); setCaptureSince(performance.now())
     } catch (e) { setError(e instanceof Error && e.message === 'duplicate-pad' ? 'התו הזה כבר שייך לפד אחר. הקישו על הפד שבחרתם.' : 'זה כלי שונה מהפרופיל. אשרו התאמה לכלי המחובר לפני המשך הכיוון.') }
   }
+  useEffect(() => {
+    if (!setupOpen || setupStep !== 'calibrate' || !armed || !latestNote) return
+    setArmed(false); learn()
+    // A fresh note is learned once, only after the adult selects a physical pad.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [latestNote?.id, armed, setupOpen, setupStep])
   const downloadProfile = () => {
     if (!profile) return
     const url = URL.createObjectURL(new Blob([JSON.stringify(profile, null, 2)], {type:'application/json'}))
@@ -310,127 +335,117 @@ export default function TurnTakingPage() {
   const demonstrationActive = isSequence && turn === 'demonstrating' && toneActive
   const characterActive = inputPulse || demonstrationActive
   const characterPad = demonstrationActive ? selectedPad : feedbackPad
-  const displaySequence = sequenceRound?.pads || (gamePads.length ? createSequenceRound(0, gamePads, sequenceLevel).pads : [])
+  const displaySequence = sequenceRound?.pads || (gamePads.length >= sequenceLevel ? createSequenceRound(roundCounter.current + 1, gamePads, sequenceLevel).pads : [])
   const activeStep = turn === 'demonstrating' ? demoIndex : turn === 'waiting' ? sequenceRound?.index : null
   const nextLevel = sequenceRound ? nextSequenceLevel(sequenceRound) : null
-  return <main dir="rtl" className="min-h-screen p-4 space-y-4 bg-sky-50" style={{ color: BRAND.navy }}>
-    <Link href="/" onClick={() => { stop(); controller.current?.disconnect() }} className="inline-flex min-h-12 items-center rounded-xl px-3 py-2 font-bold"><PilotIcon name="home" /> חזרה לבית</Link>
-    <h1 className="text-2xl font-black">{isSequence ? 'מנגנים עם הלהקה' : 'התור שלי, התור שלך'}</h1>
-    <section aria-label={isSequence ? 'משחק רצפים' : 'משחק תורות'} data-game-mode={gameMode} className="rounded-3xl bg-white p-4 text-center space-y-3 shadow-sm">
-      <div className="flex items-end justify-center gap-2 rounded-3xl" data-character-response={characterActive ? "playing" : "idle"} data-cue-source={demonstrationActive ? 'demonstration' : inputPulse ? 'input' : 'idle'} data-response-event-id={inputPulse ? lastAccepted ?? undefined : undefined} data-demo-step={demonstrationActive && demoIndex !== null ? demoIndex + 1 : undefined} data-demo-round-id={demonstrationActive ? sequenceRound?.id : undefined} style={{ outline: characterActive ? `6px solid ${PAD_CUES.find(p => p.id === characterPad)!.color}` : "6px solid transparent" }} aria-label="חברי הלהקה">
-        <StaticCharacter character="G" height={isSequence ? 72 : undefined} /><StaticCharacter character="R" height={isSequence ? 72 : undefined} /><StaticCharacter character="M" height={isSequence ? 72 : undefined} />
-        {isSequence && <BeatCore character="R" state={beatCoreStateForTurn(turn, toneActive)} size={48} decorative />}
+  const cue = PAD_CUES.find(p => p.id === selectedPad)!
+  const stepTitle = {connect:'1 · מחברים את התופים', calibrate:'2 · בוחרים פד ומקישים', options:'3 · מוכנים למשחק', pads:'בחירת פדים למשחק', backup:'גיבוי והחלפת כלי', report:'אבחון ושמירת דוח למבוגר', log:'יומן קלט'}[setupStep]
+  const closeSetup = () => { setArmed(false); setSetupOpen(false) }
+  return <main dir="rtl" className="turn-screen" style={{ color: BRAND.navy }}>
+    <header className="turn-header">
+      <Link href="/" onClick={() => { stop(); controller.current?.disconnect() }} aria-label="חזרה לבית"><PilotIcon name="home" /></Link>
+      <h1>{isSequence ? 'מנגנים עם הלהקה' : 'התור שלי, התור שלך'}</h1>
+      <button onClick={() => openSetup()} aria-label="הגדרות כלי למבוגר">הגדרות</button>
+    </header>
+    <section aria-label={isSequence ? 'משחק רצפים' : 'משחק תורות'} data-game-mode={gameMode} className="turn-stage">
+      <div className="turn-band" data-character-response={characterActive ? 'playing' : 'idle'} data-cue-source={demonstrationActive ? 'demonstration' : inputPulse ? 'input' : 'idle'} data-response-event-id={inputPulse ? lastAccepted ?? undefined : undefined} data-demo-step={demonstrationActive && demoIndex !== null ? demoIndex + 1 : undefined} data-demo-round-id={demonstrationActive ? sequenceRound?.id : undefined} style={{ outline: characterActive ? `4px solid ${PAD_CUES.find(p => p.id === characterPad)!.color}` : '4px solid transparent' }} aria-label="חברי הלהקה">
+        <StaticCharacter character="G" height={64} /><StaticCharacter character="R" height={64} /><StaticCharacter character="M" height={64} />
+        <BeatCore character="R" state={beatCoreStateForTurn(turn, toneActive)} size={40} decorative />
       </div>
-      {!isSequence && <div className="flex justify-center"><BeatCore character="R" state={beatCoreStateForTurn(turn, toneActive)} size={84} decorative /></div>}
+      <p className="turn-status" role="status" data-turn={turn}>{isSequence ? turn === 'waiting' ? 'עכשיו אתם — נגנו לפי הסדר' : turn === 'demonstrating' ? toneActive ? 'מקשיבים למקצב של הלהקה' : 'מנוחה — עוד מעט תורכם' : turn === 'responded' ? 'הרצף הושלם!' : labels[turn] : turn === 'waiting' && targetActions === 2 ? 'התור שלך — נגנו פעמיים' : labels[turn]}</p>
       {isSequence && <div data-sequence-level={sequenceLevel}>
-        <p className="font-black">שלב {sequenceLevel} מתוך 3</p>
-        <ol dir="rtl" aria-label="הרצף לנגינה, מימין לשמאל" className="mt-2 flex justify-center gap-2">
-          {displaySequence.map((id, index) => { const cue = PAD_CUES.find(p => p.id === id)!; const completed = turn !== 'demonstrating' && index < (sequenceRound?.index || 0); return <li key={index} data-sequence-step={index + 1} data-sequence-pad={id} data-step-active={activeStep === index ? 'true' : 'false'} data-step-complete={completed ? 'true' : 'false'} aria-current={activeStep === index ? 'step' : undefined} aria-label={`צעד ${index + 1}: ${cue.label}${completed ? ', הושלם' : ''}`} className="min-w-0 flex-1 max-w-24 rounded-2xl border-2 border-slate-800 p-2 text-slate-900" style={{background:cue.color,outline:activeStep === index ? '4px solid #1e1b4b' : undefined}}>
-            <span className="block text-xs font-bold">{index + 1}</span><span className="block text-2xl" aria-hidden="true">{cue.symbol}</span><span className="block text-xs font-bold min-h-4">{completed ? '✓' : activeStep === index ? turn === 'demonstrating' ? 'מקשיבים' : 'עכשיו' : ''}</span>
+        <p className="turn-caption">שלב {sequenceLevel} מתוך 3 · {sequenceLevel === 3 ? 'טָם · טַ־טַ · מנוחה' : sequenceLevel === 2 ? 'טָם · טָם · מנוחה' : 'טָם · מקשיבים עד התור שלנו'}</p>
+        <ol dir="rtl" aria-label="הרצף לנגינה, מימין לשמאל" className="turn-sequence">
+          {displaySequence.map((id, index) => { const p = PAD_CUES.find(p => p.id === id)!; const complete = turn !== 'demonstrating' && index < (sequenceRound?.index || 0); return <li key={index} data-sequence-step={index + 1} data-sequence-pad={id} data-step-active={activeStep === index ? 'true' : 'false'} data-step-complete={complete ? 'true' : 'false'} aria-current={activeStep === index ? 'step' : undefined} aria-label={`צעד ${index + 1}: ${p.label}${complete ? ', הושלם' : ''}`} style={{background:p.color,outline:activeStep === index ? '4px solid #1e1b4b' : undefined}}>
+            <span>{index + 1}</span><strong aria-hidden="true">{p.symbol}</strong><span>{complete ? '✓' : activeStep === index ? turn === 'demonstrating' ? 'מקשיבים' : 'עכשיו' : ' '}</span>
           </li>})}
         </ol>
       </div>}
-      {(ready || profile) && <div data-target-pad={selectedPad} className="mx-auto max-w-xs rounded-3xl border-4 border-slate-800 p-3" style={{background: PAD_CUES.find(p => p.id === selectedPad)!.color}}>
-        <span aria-hidden="true" className={isSequence ? "text-3xl text-slate-900" : "text-5xl text-slate-900"}>{PAD_CUES.find(p => p.id === selectedPad)!.symbol}</span>
-        <p className="font-black text-lg text-slate-900">{isSequence && turn === 'demonstrating' ? 'מקשיבים ומסתכלים על הפד ה' : 'מנגנים על הפד ה'}{PAD_CUES.find(p => p.id === selectedPad)!.label}</p>
-        <div dir="ltr" className="mt-3 grid grid-cols-4 gap-2 rounded-xl bg-white/90 p-2" aria-label="מיקום הפד בכלי, לוח הכפתורים למעלה">
-          {PAD_CUES.map(p => <span key={p.id} data-pad-position={p.id} aria-label={p.label} style={{gridRow:p.row,gridColumn:p.column,background:p.color,opacity:p.id === selectedPad ? 1 : 0.3,outline:p.id === selectedPad ? '3px solid #0f172a' : undefined}} className="flex min-h-8 items-center justify-center rounded-full border border-slate-600 font-black text-slate-900">{p.symbol}</span>)}
+      {(ready || profile) ? <div data-target-pad={selectedPad} className="turn-target" style={{borderColor:cue.color}}>
+        <p className="font-black">{turn === 'demonstrating' ? 'מקשיבים: ' : 'הפד הבא: '}{cue.label}</p>
+        <div dir="ltr" className="turn-pad-map" aria-label="מיקום הפד בכלי, לוח הכפתורים למעלה">
+          {PAD_CUES.map(p => <span key={p.id} data-pad-position={p.id} aria-label={p.label} style={{gridRow:p.row,gridColumn:p.column,background:p.color,opacity:p.id === selectedPad ? 1 : 0.35,outline:p.id === selectedPad ? '3px solid #0f172a' : undefined}}>{p.symbol}</span>)}
         </div>
-      </div>}
-      <p className="text-xl font-black" role="status" data-turn={turn}>{isSequence ? turn === 'waiting' ? 'עכשיו אתם — נגנו לפי הסדר' : turn === 'demonstrating' ? 'הלהקה מדגימה — מקשיבים ומסתכלים' : turn === 'responded' ? sequenceLevel === 3 ? 'ניגנתם רצף של שלוש הקשות!' : 'הרצף הושלם!' : labels[turn] : turn === 'waiting' && targetActions === 2 ? 'התור שלך — נגנו פעמיים' : labels[turn]}</p>
-      <p className="text-sm">{isSequence ? 'מקשיבים לרצף, ואז מנגנים את הפדים המסומנים. אפשר לקחת את הזמן ולנסות שוב.' : targetActions === 1 ? 'מקשיבים לצליל אחד, ואז מנגנים פעם אחת.' : 'מקשיבים לשני צלילים, ואז מנגנים פעמיים.'}</p>
-      <p data-action-progress data-game-response-id={lastGameEventId ?? undefined} aria-live="polite">{actionsInTurn} מתוך {isSequence ? displaySequence.length : targetActions} פעולות בסבב</p>
-      {lastAction && <p className="rounded-xl p-2 font-bold" style={{ background: BRAND.yellow }} data-input-feedback data-input-event-id={lastAccepted ?? undefined}>{lastAction}</p>}
-      <div className="flex flex-wrap justify-center gap-2">
-        <button disabled={!ready || busy || (isSequence && !gamePads.length)} onClick={() => void start()} className="rounded-xl p-3 text-white font-bold disabled:opacity-40" style={{ background: BRAND.cyan }}><PilotIcon name={turn === 'ready' ? 'play' : 'hear-again'} /> {turn === 'ready' ? 'התחילו' : isSequence ? 'הרצף שוב' : 'שמעו שוב והתחילו'}</button>
-        {isSequence && nextLevel !== null && <button onClick={() => void start(nextLevel)} className="min-h-12 rounded-xl p-3 bg-emerald-200 font-black"><PilotIcon name="next" /> לשלב הבא</button>}
-        <button onClick={() => stop()} className="rounded-xl p-3 bg-slate-100 font-bold"><PilotIcon name="stop" /> עצירה</button>
-        <button onClick={() => { stop('ready'); if (isSequence) { updateRound(null); setSequenceLevel(1) } }} className="rounded-xl p-3 bg-slate-100 font-bold"><PilotIcon name="try-again" /> {isSequence ? 'משחק חדש' : 'חזרה להתחלה'}</button>
-      </div>
-      {!ready && <p className="text-sm">לפני שמתחילים, מבוגר מחבר ומכוון את תופי SENOSEN דרך הגדרות הכלי.</p>}
-      {mode === 'simulation' && <div className="rounded-xl bg-amber-100 p-3 space-y-2">
-        <p className="font-bold">מצב הדמיה לפיתוח — אינו הוכחת חיבור לכלי.</p>
-        {isSequence ? <div className="flex flex-wrap justify-center gap-2">{SIM_PADS.map(pad => <button key={pad.id} onClick={() => handle.current('simulation', SIM_PORT, [144, pad.note, 100], performance.now())} className="min-h-12 rounded-xl bg-white p-3 font-bold">הדמיית {PAD_CUES.find(p => p.id === pad.id)!.label}</button>)}</div> : <button onClick={() => handle.current('simulation', SIM_PORT, [144, 60, 100], performance.now())} className="rounded-xl bg-white p-3 font-bold">פעולת הדמיה</button>}
-      </div>}
-      {error && <p role="alert" className="text-sm font-bold">{error}</p>}
+      </div> : <p className="turn-welcome">מחברים תופים, מקשיבים ללהקה ומנגנים יחד.<br />לחצו על ״התחילו״ ונחבר את הכלי.</p>}
+      <p data-action-progress data-game-response-id={lastGameEventId ?? undefined} aria-live="polite">{actionsInTurn} מתוך {isSequence ? sequenceLevel : targetActions} פעולות בסבב</p>
+      <p className="turn-feedback" data-input-feedback data-input-event-id={lastAccepted ?? undefined} aria-live="polite">{lastAction || (turn === 'waiting' ? 'אפשר לקחת את הזמן ולנסות שוב' : '\u00a0')}</p>
+      {error && !setupOpen && <p role="alert" className="turn-error">{error}</p>}
+      {mode === 'simulation' && <div className="turn-simulation"><p>הדמיית פיתוח — ללא כלי פיזי</p><div>
+        {(isSequence ? SIM_PADS : SIM_PADS.slice(0,1)).map(pad => <button key={pad.id} onClick={() => handle.current('simulation', SIM_PORT, [144, pad.note, 100], performance.now())}>{isSequence ? `הדמיית ${PAD_CUES.find(p => p.id === pad.id)!.label}` : 'פעולת הדמיה'}</button>)}
+      </div></div>}
     </section>
-    <button aria-expanded={setupOpen} aria-controls="instrument-setup" onClick={() => setSetupOpen(open => !open)} className="rounded-xl bg-white p-3 font-bold">
-      {setupOpen && <PilotIcon name="close" />} {setupOpen ? 'סגירת הגדרות הכלי' : 'הגדרות כלי למבוגר'}
-    </button>
-    {setupOpen && <section id="instrument-setup" aria-label="הגדרות כלי למבוגר" className="rounded-3xl bg-white p-4 space-y-4 shadow-sm">
-      <h2 className="text-lg font-black">חיבור וכיוון תופי SENOSEN</h2>
-      <p className="text-sm">החיבור מיועד ליציאת MIDI של התופים ולמחשב או לטאבלט עם דפדפן שתומך ב־Web MIDI, כולל Chromebook עם Chrome. משתמשים בכבל נתונים ובמתאם המתאים ליחידה. אין מיפוי תופים קבוע: לומדים כל פד מהקלט שמגיע בפועל ושומרים בדפדפן. תשעת המיקומים מתאימים לפריסה שבתמונה; ארבעת הפדים התכולים נבדלים לפי מיקום ומספר. לוח הכפתורים נמצא למעלה, ושמאל וימין הם מצד הנגן. המבוגר מאמת כל מיקום מול הכלי בפועל; אין זיהוי אוטומטי של צבע פיזי.</p>
-      <label className="block font-bold">מקור קלט
-        <select value={mode} onChange={e => switchMode(e.target.value as InputEvent['source'])} className="block w-full rounded-xl border p-3 mt-1">
-          <option value="web-midi">כלי MIDI — SENOSEN</option><option value="simulation">הדמיית פיתוח בלבד</option>
-        </select>
-      </label>
-      {mode === 'web-midi' && <div className="space-y-3">
-        <p>{capability}</p>
-        <button disabled={busy} onClick={connect} className="rounded-xl bg-sky-100 p-3 font-bold disabled:opacity-40">בדקו כניסות קלט</button>
-        <p role="status">{ports.length ? `כניסות שנמצאו: ${ports.map(p => p.name).join(', ')}` : 'עדיין לא נפתחה כניסת MIDI. חברו את הכלי ולחצו לבדיקה.'}</p>
-        <p role="status" data-profile-status>{profileStatus}</p>
-        <label className="block font-bold">הפד שמכוונים
-          <select value={learnSlot} onChange={e => {setLearnSlot(e.target.value as PadId); setCaptureSince(performance.now())}} className="block w-full rounded-xl border p-3">
-            {PAD_CUES.map(p => <option key={p.id} value={p.id}>{p.label} {p.symbol}{profile?.pads.some(x => x.id === p.id) ? ' — שמור' : ''}</option>)}
-          </select>
-        </label>
-        <p className="text-sm">הכו פעם אחת על הפד שנבחר. בדקו שזה התו שמופיע, ואז מפו אותו למשחק. זיהוי כניסה לבדו אינו מאמת חיבור פיזי.</p>
-        <p data-latest-note>{latestNote ? `קלט אחרון: ${latestNote.port.name} · ערוץ ${latestNote.channel}, תו ${latestNote.note}, עוצמה ${latestNote.velocity}` : 'ממתינים להקשה חדשה על הפד'}</p>
-        <button disabled={!latestNote} onClick={learn} className="rounded-xl bg-sky-100 p-3 font-bold disabled:opacity-40"><PilotIcon name="confirm" /> מפו את התו האחרון למשחק</button>
-        {profile && <div className="space-y-2">
-          <label className="block font-bold">הפד למשחק<select value={selectedPad} onChange={e => selectPad(e.target.value as PadId)} className="block w-full rounded-xl border p-3">{profile.pads.map(p => <option key={p.id} value={p.id}>{PAD_CUES.find(c => c.id === p.id)!.label} {PAD_CUES.find(c => c.id === p.id)!.symbol}</option>)}</select></label>
-          <p>{profile.pads.length} פדים שמורים. כוונו פעם אחת את כל הפדים שבהם תרצו להשתמש.</p>
-          {!matchProfile(profile, ports) && ports.map(p => <button key={p.id} onClick={() => confirmPort(p)} className="rounded-xl bg-amber-100 p-3">אישור מבוגר: התאימו פרופיל ל־{p.name}</button>)}
-          <button onClick={downloadProfile} className="rounded-xl bg-slate-100 p-3">הורידו גיבוי כיוון</button>
-        </div>}
-        <label className="block">ייבוא כיוון מגן אחר<input type="file" accept="application/json,.json" onChange={e => {void importProfile(e.target.files?.[0]); e.target.value = ''}} className="block max-w-full" /></label>
-        <p className="text-sm">הכיוון נשמר למכשיר ולכתובת האתר האלה. במכשיר או כתובת חדשים אפשר לייבא גיבוי; זהות שונה מחייבת אישור ובדיקת מבוגר.</p>
-        {mapping && <p className="font-bold">מיפוי: ערוץ {mapping.channel}, תו {mapping.note}</p>}
-      </div>}
-      <label className="block font-bold">אופן המשחק
-        <select value={gameMode} onChange={e => { stop('ready'); const next = e.target.value as 'sequence' | 'turns'; gameModeRef.current = next; setGameMode(next); updateRound(null); setSequenceLevel(1); if (next === 'turns' && state.current.mode === 'simulation') applyTargetPad('green') }} className="block w-full rounded-xl border p-3 mt-1">
-          <option value="sequence">משחק רצפים עם הלהקה</option><option value="turns">תרגול תורות פשוט</option>
-        </select>
-      </label>
-      {isSequence && <div className="space-y-3">
-        <label className="block font-bold">רמת פתיחה<select value={sequenceLevel} onChange={e => { stop('ready'); updateRound(null); setSequenceLevel(Number(e.target.value)) }} className="block w-full rounded-xl border p-3"><option value={1}>1 — הקשה אחת</option><option value={2}>2 — שתי הקשות ברצף</option><option value={3}>3 — שלוש הקשות ברצף</option></select></label>
-        <label className="block font-bold">מהירות ההדגמה<select value={demoTempo} onChange={e => { stop('ready'); updateRound(null); setDemoTempo(Number(e.target.value)) }} className="block w-full rounded-xl border p-3"><option value={1200}>איטית</option><option value={900}>רגועה</option><option value={650}>מהירה יותר</option></select></label>
-        <fieldset className="rounded-xl border p-3"><legend className="font-bold">עד שלושה פדים למשחק, מתוך הכיוון השמור</legend>
-          {availablePads.map(id => <label key={id} className="flex min-h-12 items-center gap-3"><input type="checkbox" checked={gamePads.includes(id)} disabled={!gamePads.includes(id) && gamePads.length >= 3} onChange={e => { stop('ready'); updateRound(null); setChosenPads(e.target.checked ? [...gamePads,id] : gamePads.filter(p => p !== id)) }} className="h-6 w-6" />{PAD_CUES.find(p => p.id === id)!.label}</label>)}
-          {!gamePads.length && <p className="text-sm">כוונו ובחרו לפחות פד אחד לפני התחלת המשחק.</p>}
-        </fieldset>
-        <p className="text-sm">ההתקדמות בודקת סדר פדים בלבד. אין ניקוד דיוק בקצב או הגבלת זמן לתשובה. צליל ההדגמה הוא אותו צליל מקורי בכל פד.</p>
-      </div>}
-      {!isSequence && <label className="block font-bold">רמת הסבב
-        <select value={targetActions} onChange={e => { stop('ready'); const count = Number(e.target.value); state.current.targetActions = count; setTargetActions(count) }} className="block w-full rounded-xl border p-3 mt-1">
-          <option value={1}>הקשה אחת</option><option value={2}>שתי הקשות</option>
-        </select>
-      </label>}
-      {ready && <button onClick={() => setSetupOpen(false)} className="rounded-xl bg-emerald-100 p-3 font-bold"><PilotIcon name="confirm" /> סיימנו לכוון, חוזרים למשחק</button>}
-      <details className="rounded-xl border p-3">
-        <summary className="cursor-pointer font-bold">אבחון ושמירת דוח למבוגר</summary>
-        <div className="mt-3 space-y-3 text-sm">
-          <p>הדוח נשמר רק בהורדה למכשיר הזה. אין צורך בשמות או בפרטים של ילדים.</p>
-          <label className="block">ציוד וכבל<input value={equipment} onChange={e => setEquipment(e.target.value)} className="block w-full rounded-lg border p-2" /></label>
-          <label className="block">מכשיר ודפדפן<input value={target} onChange={e => setTarget(e.target.value)} className="block w-full rounded-lg border p-2" /></label>
-          <label className="block">מספר פעולות פיזיות שנצפו<input type="number" min="0" step="1" value={observed} onChange={e => setObserved(e.target.value)} className="block w-full rounded-lg border p-2" /></label>
-          <label className="block">הערות לבדיקה<textarea value={notes} onChange={e => setNotes(e.target.value)} className="block w-full rounded-lg border p-2" /></label>
-          <p>תגובות במשחק: {totalAccepted.current} · מסירות זהות שסוננו: {totalDuplicate.current}</p>
-          <p>סבבים שהושלמו: {completedRounds.current} · הודעות קלט: {total.current}</p>
-          <div className="flex flex-wrap gap-2">
-            <button onClick={clear} className="rounded-xl bg-slate-100 p-3 font-bold">התחילו מדידה חדשה</button>
-            <button onClick={exportReport} className="rounded-xl bg-slate-100 p-3 font-bold">הורידו דוח JSON</button>
-          </div>
-          <p>בדיקות תוכנה אינן הוכחת כלי פיזי. יש להשוות בין ההקשות שנצפו, תגובת המשחק והאירועים בדוח.</p>
-          <ol aria-label="יומן קלט" className="max-h-64 overflow-y-auto space-y-2">
-            {rows.slice(0, 30).map(row => <li key={row.id} className="rounded-lg bg-slate-50 p-2 break-words">
-              #{row.id} · {row.source === 'simulation' ? 'הדמיה' : row.port.name} · {row.bytes.join(', ')} · {reasons[row.decision] || row.decision}
-            </li>)}
-          </ol>
-        </div>
-      </details>
-      <Link href="/teacher" onClick={() => { stop(); controller.current?.disconnect() }} className="inline-block py-2 font-bold">חזרה למצב גננת</Link>
-    </section>}
+    <footer className="turn-actions">
+      {isSequence && nextLevel !== null ? <button className="turn-primary" onClick={() => void start(nextLevel)}><PilotIcon name="next" /> {gamePads.length >= nextLevel ? 'לשלב הבא' : 'כוונו פד נוסף לשלב הבא'}</button> : <button disabled={busy} className="turn-primary" onClick={() => void start()}><PilotIcon name={turn === 'ready' ? 'play' : 'hear-again'} /> {busy ? 'מכינים את השמע…' : turn === 'ready' ? 'התחילו' : isSequence ? 'הרצף שוב' : 'שמעו שוב והתחילו'}</button>}
+      <div className="turn-secondary">
+        <button onClick={() => stop()}><PilotIcon name="stop" /> עצירה</button>
+        {isSequence && nextLevel !== null && <button onClick={() => void start()}><PilotIcon name="hear-again" /> הרצף שוב</button>}
+        <button onClick={() => { stop('ready'); updateRound(null); setSequenceLevel(1) }}><PilotIcon name="try-again" /> משחק חדש</button>
+      </div>
+    </footer>
+    <dialog ref={dialog} className="turn-dialog" aria-labelledby="setup-title" onCancel={closeSetup} onClose={closeSetup}>
+      <header><h2 id="setup-title" tabIndex={-1}>{stepTitle}</h2><button aria-label="סגירת הגדרות הכלי" onClick={closeSetup}><PilotIcon name="close" /></button></header>
+      <div className="turn-dialog-page" key={setupStep}>
+        {setupStep === 'connect' && <>
+          <p>חברו את יציאת MIDI של SENOSEN בכבל נתונים למחשב או לטאבלט התומך ב־Web MIDI.</p>
+          <button className="turn-primary" disabled={busy} onClick={connect}>{busy ? 'מחפשים את הכלי…' : 'חיבור התופים'}</button>
+          <p role="status">{ports.length ? `נמצא: ${ports.map(p => p.name).join(', ')}` : capability}</p>
+          <p data-profile-status>{profileStatus}</p>
+          {profile && !matchProfile(profile, ports) && ports.map(p => <button key={p.id} onClick={() => confirmPort(p)}>אישור מבוגר: התאימו פרופיל ל־{p.name}</button>)}
+          <button disabled={!ports.length && mode !== 'simulation'} onClick={() => setSetupStep(ready && gamePads.length >= sequenceLevel ? 'options' : 'calibrate')}>{ready ? 'הכיוון נשמר — ממשיכים' : 'הבא — כיוון הפדים'}</button>
+          <button onClick={() => setSetupStep('backup')}>ייבוא כיוון או הדמיית פיתוח</button>
+        </>}
+        {setupStep === 'calibrate' && <>
+          <p>בחרו כאן את הפד, ואז הקישו עליו פעם אחת בתופים. הכיוון יישמר אוטומטית.</p>
+          <p className="turn-caption">לרצף של 3: כוונו למשל תכלת 1, סגול וירוק. המיקומים הם מצד הנגן, לוח הכפתורים למעלה.</p>
+          <div dir="ltr" className="turn-calibration" aria-label="בחירת הפד לכיוון">{PAD_CUES.map(p => <button key={p.id} aria-label={`כיוון ${p.label}`} aria-pressed={armed && learnSlot === p.id} style={{gridRow:p.row,gridColumn:p.column,background:p.color}} disabled={!ports.length || mode !== 'web-midi'} onClick={() => {setLearnSlot(p.id);setCaptureSince(performance.now());setArmed(true);setError('')}}><strong>{p.symbol}</strong><small>{profile?.pads.some(x=>x.id===p.id) ? '✓ שמור' : p.label.split(' — ')[0]}</small></button>)}</div>
+          <p role="status" data-latest-note>{armed ? `הקישו עכשיו על הפד ה${PAD_CUES.find(p => p.id === learnSlot)!.label}` : `${profile?.pads.length || 0} פדים שמורים. בחרו פד נוסף או המשיכו.`}</p>
+          <p className="turn-caption">אין זיהוי אוטומטי של צבע: בדקו שהפד שבחרתם תואם לכלי.</p>
+          <button className="turn-primary" disabled={!ready} onClick={() => {setArmed(false);setSetupStep('options')}}>הבא — למשחק</button>
+          <button onClick={() => setSetupStep('connect')}>חזרה לחיבור</button>
+        </>}
+        {setupStep === 'options' && <>
+          <label>אופן המשחק<select value={gameMode} onChange={e => {stop('ready'); const next=e.target.value as 'sequence'|'turns';gameModeRef.current=next;setGameMode(next);updateRound(null);setSequenceLevel(1);if(next==='turns' && mode==='simulation')applyTargetPad('green')}}><option value="sequence">משחק רצפים עם הלהקה</option><option value="turns">תרגול תורות פשוט</option></select></label>
+          {isSequence ? <>
+            <label>רמת פתיחה<select value={sequenceLevel} onChange={e=>{stop('ready');updateRound(null);setSequenceLevel(Number(e.target.value))}}>{[1,2,3].map(n=><option key={n} value={n} disabled={gamePads.length<n}>{n} — {n} {n===1?'הקשה':'הקשות בפדים שונים'}{gamePads.length<n?' (נדרשים עוד פדים)':''}</option>)}</select></label>
+            <label>מהירות ההדגמה<select value={demoTempo} onChange={e=>{stop('ready');updateRound(null);setDemoTempo(Number(e.target.value))}}><option value={1200}>איטית — 50 פעימות בדקה</option><option value={900}>רגועה — כ־67 פעימות בדקה</option><option value={650}>מהירה יותר — כ־92 פעימות בדקה</option></select></label>
+            <p className="turn-caption">תיבה של 4 פעימות, עם מנוחה לפני תור הילד. ההתקדמות בודקת סדר פדים; אין מגבלת זמן או ציון דיוק בקצב.</p>
+          </> : <label>רמת הסבב<select value={targetActions} onChange={e=>{stop('ready');const n=Number(e.target.value);state.current.targetActions=n;setTargetActions(n)}}><option value={1}>הקשה אחת</option><option value={2}>שתי הקשות</option></select></label>}
+          {gamePads.length<3 && isSequence && <p>כרגע {gamePads.length} פדים זמינים. כדי להגיע לשלוש הקשות שונות, כוונו ובחרו לפחות 3.</p>}
+          <button className="turn-primary" disabled={!ready || (isSequence && gamePads.length<sequenceLevel)} onClick={closeSetup}>סיימנו לכוון, חוזרים למשחק</button>
+          <div className="turn-options-grid"><button onClick={()=>setSetupStep('calibrate')}>כיוון פדים</button><button onClick={()=>setSetupStep('pads')}>פדים למשחק</button><button onClick={()=>setSetupStep('backup')}>כלי וגיבוי</button><button onClick={()=>setSetupStep('report')}>אבחון ושמירת דוח למבוגר</button></div>
+        </>}
+        {setupStep === 'pads' && <>
+          <p>הרצף ישתמש בפדים המסומנים בלבד, בלי לחזור על אותו פד באותו רצף.</p>
+          <div className="turn-options-grid">{availablePads.map(id=><label key={id} className="turn-check"><input type="checkbox" checked={gamePads.includes(id)} onChange={e=>{stop('ready');updateRound(null);setChosenPads(e.target.checked?[...gamePads,id]:gamePads.filter(p=>p!==id));setSequenceLevel(1)}} />{PAD_CUES.find(p=>p.id===id)!.label}</label>)}</div>
+          {!availablePads.length && <p>אין עדיין פדים מכוילים.</p>}
+          {!isSequence && profile && <label>הפד למשחק<select value={selectedPad} onChange={e=>selectPad(e.target.value as PadId)}>{profile.pads.map(p=><option key={p.id} value={p.id}>{PAD_CUES.find(c=>c.id===p.id)!.label}</option>)}</select></label>}
+          <button onClick={()=>setSetupStep('options')}>חזרה להגדרות המשחק</button>
+        </>}
+        {setupStep === 'backup' && <>
+          <label>מקור קלט<select value={mode} onChange={e=>switchMode(e.target.value as InputEvent['source'])}><option value="web-midi">כלי MIDI — SENOSEN</option><option value="simulation">הדמיית פיתוח בלבד</option></select></label>
+          <button onClick={()=>setSetupStep(mode==='simulation'?'options':'connect')}>{mode==='simulation'?'ממשיכים בהדמיה':'חיבור כלי MIDI'}</button>
+          <button disabled={!profile} onClick={downloadProfile}>הורידו גיבוי כיוון</button>
+          <label>ייבוא כיוון מגן אחר<input type="file" accept="application/json,.json" onChange={e=>{void importProfile(e.target.files?.[0]);e.target.value=''}} /></label>
+          <p data-profile-status>{profileStatus}</p>
+          <p>הכיוון נשמר בדפדפן ובכתובת האלה. בכלי שונה נדרש אישור מבוגר ובדיקת הפדים.</p>
+          <button onClick={()=>setSetupStep('options')}>חזרה להגדרות המשחק</button>
+        </>}
+        {setupStep === 'report' && <>
+          <p>הדוח יורד למכשיר בלבד. אין להזין פרטים של ילדים.</p>
+          <label>ציוד וכבל<input value={equipment} onChange={e=>setEquipment(e.target.value)} /></label>
+          <label>מכשיר ודפדפן<input value={target} onChange={e=>setTarget(e.target.value)} /></label>
+          <label>מספר פעולות פיזיות שנצפו<input type="number" min="0" step="1" value={observed} onChange={e=>setObserved(e.target.value)} /></label>
+          <label>הערות לבדיקה<input value={notes} onChange={e=>setNotes(e.target.value)} /></label>
+          <div className="turn-options-grid"><button onClick={exportReport}>הורידו דוח JSON</button><button onClick={()=>{setLogPage(0);setSetupStep('log')}}>יומן קלט</button><button onClick={clear}>התחילו מדידה חדשה</button><button onClick={()=>setSetupStep('options')}>חזרה למשחק</button></div>
+        </>}
+        {setupStep === 'log' && <>
+          <p>תגובות: {totalAccepted.current} · כפילויות שסוננו: {totalDuplicate.current} · סבבים: {completedRounds.current}</p>
+          <ol aria-label="יומן קלט" className="turn-log">{rows.slice(logPage*4,logPage*4+4).map(row=><li key={row.id}>#{row.id} · {row.source==='simulation'?'הדמיה':row.port.name} · {row.bytes.join(', ')} · {reasons[row.decision]||row.decision}</li>)}</ol>
+          <div className="turn-options-grid"><button disabled={logPage===0} onClick={()=>setLogPage(p=>p-1)}>הקודם</button><button disabled={(logPage+1)*4>=rows.length} onClick={()=>setLogPage(p=>p+1)}>הבא</button></div>
+          <p>בדיקת תוכנה אינה הוכחה לפעולת כלי פיזי.</p><button onClick={()=>setSetupStep('report')}>חזרה לדוח</button>
+        </>}
+        {error && <p role="alert" className="turn-error">{error}</p>}
+      </div>
+    </dialog>
   </main>
 }

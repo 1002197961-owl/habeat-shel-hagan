@@ -1,122 +1,57 @@
-// Software fixture only. No physical instrument, child or headphone verification.
-import {chromium} from 'playwright'
 import assert from 'node:assert/strict'
-import {readFileSync} from 'node:fs'
-const base=process.env.PREVIEW_TEST_URL||'http://127.0.0.1:3010'
-const browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_EXECUTABLE,args:['--no-sandbox']})
+import {mkdirSync,readFileSync} from 'node:fs'
+import {launch,fixture,button,connect,noScroll,close,send,options} from './turn-browser-fixture.mjs'
+const browser=await launch();mkdirSync('test-results',{recursive:true})
+const pads=[{id:'blue',channel:10,note:38},{id:'purple',channel:10,note:43},{id:'green',channel:10,note:46}]
 try {
- for(const viewport of [{width:390,height:844},{width:768,height:1024}]) {
-  const context=await browser.newContext({viewport,acceptDownloads:true})
-  await context.route('**/*',route=>new URL(route.request().url()).origin===new URL(base).origin?route.continue():route.abort())
-  const page=await context.newPage(),errors=[]
-  page.on('pageerror',error=>errors.push(error.message))
-  await page.addInitScript(()=>{
-   class Port extends EventTarget {
-    id='SEQUENCE-SOFTWARE-FIXTURE';name='SEQUENCE SOFTWARE FIXTURE';manufacturer='TEST';state='connected'
-    open(){return Promise.resolve(this)}close(){return Promise.resolve(this)}
-    send(note,stamp=performance.now(),velocity=90){const e=new Event('midimessage');Object.defineProperties(e,{data:{value:new Uint8Array([153,note,velocity])},timeStamp:{value:stamp}});this.dispatchEvent(e)}
-   }
-   const port=new Port(),access=new EventTarget();access.inputs=new Map([[port.id,port]])
-   window.__sequenceFixture={port,access,disconnect(){port.state='disconnected';access.dispatchEvent(new Event('statechange'))},reconnect(){port.state='connected';access.dispatchEvent(new Event('statechange'))}}
-   Object.defineProperty(navigator,'requestMIDIAccess',{value:async()=>access})
-   localStorage.setItem('habeat.instrument-profile.v1',JSON.stringify({version:1,port:{id:port.id,name:port.name,manufacturer:port.manufacturer},pads:[{id:'green',channel:10,note:38},{id:'orange',channel:10,note:43},{id:'yellow',channel:10,note:46}]}))
-  })
-  await page.goto(base+'/turn-taking')
-  await page.getByRole('button',{name:'הגדרות כלי למבוגר',exact:true}).click()
-  assert.equal(await page.getByLabel('אופן המשחק').inputValue(),'sequence')
-  await page.getByRole('button',{name:'בדקו כניסות קלט',exact:true}).click()
-  await page.getByText(/הכלי המוכר זוהה/).waitFor()
-  await page.getByLabel('מהירות ההדגמה').selectOption('650')
-  await page.getByRole('button',{name:'סיימנו לכוון, חוזרים למשחק',exact:true}).click()
+ for(const viewport of [{width:390,height:844},{width:360,height:640},{width:768,height:1024},{width:1024,height:768}]) {
+  const page=await browser.newPage({viewport,acceptDownloads:true}),errors=[]
+  page.on('pageerror',e=>errors.push(e.message))
+  await fixture(page,pads);await noScroll(page)
+  const primary=button(page,'התחילו');assert.ok(await primary.isEnabled())
+  assert.deepEqual(await primary.evaluate(el=>({bg:getComputedStyle(el).backgroundColor,color:getComputedStyle(el).color})),{bg:'rgb(30, 27, 75)',color:'rgb(255, 255, 255)'})
+  await connect(page);await noScroll(page)
+  await button(page,'הכיוון נשמר — ממשיכים').click();await noScroll(page)
+  await page.getByLabel('מהירות ההדגמה').selectOption('650');await close(page)
   for(let level=1;level<=3;level++) {
-   await page.getByRole('button',{name:level===1?'התחילו':'לשלב הבא',exact:true}).click()
+   await button(page,level===1?'התחילו':'לשלב הבא').click()
    await page.locator('[data-turn="demonstrating"]').waitFor()
-   // Early input cannot consume a step of the later response.
-   await page.evaluate(()=>window.__sequenceFixture.port.send(38))
+   await send(page,38) // early input cannot consume the later response
+   const sequence=await page.locator('[data-sequence-step]').evaluateAll(nodes=>nodes.map(n=>n.dataset.sequencePad))
+   assert.equal(new Set(sequence).size,level)
    await page.locator('[data-turn="waiting"]').waitFor()
    assert.equal(await page.locator('[data-action-progress]').innerText(),`0 מתוך ${level} פעולות בסבב`)
-   assert.deepEqual(await page.locator('[data-sequence-step]').evaluateAll(nodes=>nodes.map(n=>n.dataset.sequencePad)),['green','orange','yellow'].slice(0,level))
-   await page.evaluate(()=>window.__sequenceFixture.port.send(46))
-   assert.equal(await page.locator('[data-action-progress]').innerText(),`0 מתוך ${level} פעולות בסבב`)
+   const wrong=pads.find(p=>p.id!==sequence[0]);await send(page,wrong.note)
    await page.getByText('ננסה שוב בנחת — עכשיו הפד המסומן',{exact:true}).waitFor()
-   for(let step=0;step<level;step++) {
-    const pad=['green','orange','yellow'][step],note=[38,43,46][step]
-    assert.equal(await page.locator('[data-step-active="true"]').getAttribute('data-sequence-pad'),pad)
-    await page.evaluate(note=>{const p=window.__sequenceFixture.port,t=performance.now();p.send(note,t);p.send(note,t);p.send(note,t+0.1,0)},note)
-    await page.waitForFunction(expected=>document.querySelector('[data-action-progress]').textContent===expected,`${step+1} מתוך ${level} פעולות בסבב`)
+   for(let i=0;i<sequence.length;i++) {
+    assert.equal(await page.locator('[data-step-active="true"]').getAttribute('data-sequence-pad'),sequence[i])
+    await page.evaluate(note=>{const p=window.__fixture.port,t=performance.now();p.send(note,t);p.send(note,t);p.send(note,t+.1,0)},pads.find(p=>p.id===sequence[i]).note)
+    await page.waitForFunction(expected=>document.querySelector('[data-action-progress]').textContent===expected,`${i+1} מתוך ${level} פעולות בסבב`)
    }
-   await page.locator('[data-turn="responded"]').waitFor()
-   await page.locator('[data-beat-core][data-core-state="idle"]').waitFor()
-   assert.equal(await page.locator('[data-step-complete="true"]').count(),level)
+   await page.locator('[data-turn="responded"]').waitFor();await noScroll(page)
   }
-  assert.equal(await page.getByRole('button',{name:'לשלב הבא',exact:true}).count(),0)
-  await page.getByRole('button',{name:'הגדרות כלי למבוגר',exact:true}).click()
-  await page.getByText('אבחון ושמירת דוח למבוגר',{exact:true}).click()
-  const downloadPromise=page.waitForEvent('download')
-  await page.getByRole('button',{name:'הורידו דוח JSON',exact:true}).click()
-  const download=await downloadPromise,report=JSON.parse(readFileSync(await download.path(),'utf8'))
-  assert.equal(report.gameMode,'sequence');assert.equal(report.timingScore,'NOT_IMPLEMENTED')
-  assert.equal(report.physicalProof,'NOT_AUTOMATICALLY_VERIFIED')
-  assert.equal(report.totals.gameResponses,6);assert.equal(report.demoEvents.length,6)
-  assert.ok(report.events.filter(e=>e.accepted).every(e=>e.padId===e.expectedPad&&e.sequenceRoundId&&e.sequenceStep))
-  assert.equal(report.events.filter(e=>e.accepted).at(-1).id,Number(await page.locator('[data-action-progress]').getAttribute('data-game-response-id')))
-  await page.getByRole('button',{name:'סגירת הגדרות הכלי',exact:true}).click()
-  await page.getByRole('button',{name:'הרצף שוב',exact:true}).click()
-  await page.getByRole('button',{name:'עצירה',exact:true}).click()
-  await page.waitForTimeout(2200)
+  const original=await page.locator('[data-sequence-step]').evaluateAll(nodes=>nodes.map(n=>n.dataset.sequencePad))
+  await button(page,'הרצף שוב').click()
+  assert.deepEqual(await page.locator('[data-sequence-step]').evaluateAll(nodes=>nodes.map(n=>n.dataset.sequencePad)),original,'replay preserves the learned pattern')
+  const scheduled=await page.evaluate(()=>window.__scheduled.slice(-3))
+  assert.ok(Math.abs(scheduled[1]-scheduled[0]-.65)<.001)
+  assert.ok(Math.abs(scheduled[2]-scheduled[1]-.325)<.001)
+  await button(page,'עצירה').click();await page.waitForTimeout(2800)
   assert.equal(await page.locator('[data-turn="paused"]').count(),1)
-  assert.equal(await page.locator('[data-beat-core][data-core-state="playing"]').count(),0)
-  await page.getByRole('button',{name:'הרצף שוב',exact:true}).click()
-  await page.locator('[data-turn="waiting"]').waitFor()
-  await page.evaluate(()=>window.__sequenceFixture.disconnect())
-  await page.locator('[data-turn="paused"]').waitFor()
-  await page.evaluate(()=>window.__sequenceFixture.reconnect())
-  assert.equal(await page.locator('[data-turn="paused"]').count(),1)
-  assert.equal(await page.locator('[data-action-progress]').innerText(),'0 מתוך 3 פעולות בסבב')
-  // A completed non-green simulated target must not leak into simple-turn cues.
-  await page.getByRole('button',{name:'הגדרות כלי למבוגר',exact:true}).click()
-  await page.getByLabel('מקור קלט').selectOption('simulation')
-  await page.getByLabel('רמת פתיחה').selectOption('2')
-  await page.getByRole('button',{name:'התחילו',exact:true}).click()
-  await page.locator('[data-turn="waiting"]').waitFor()
-  await page.getByRole('button',{name:'הדמיית ירוק — אמצע שמאל',exact:true}).click()
-  await page.getByRole('button',{name:'הדמיית כתום — אמצע ימין',exact:true}).click()
-  await page.locator('[data-turn="responded"]').waitFor()
-  assert.equal(await page.locator('[data-target-pad]').getAttribute('data-target-pad'),'orange')
-  await page.getByRole('button',{name:'הגדרות כלי למבוגר',exact:true}).click()
-  await page.getByLabel('אופן המשחק').selectOption('turns')
-  assert.equal(await page.locator('[data-target-pad]').getAttribute('data-target-pad'),'green')
-  await page.getByRole('button',{name:'סיימנו לכוון, חוזרים למשחק',exact:true}).click()
-  await page.getByRole('button',{name:'התחילו',exact:true}).click()
-  await page.locator('[data-turn="waiting"]').waitFor()
-  await page.getByRole('button',{name:'פעולת הדמיה',exact:true}).click()
-  await page.locator('[data-turn="responded"]').waitFor()
-  // Return from an orange simulation target to a real-source profile containing only blue.
-  await page.getByRole('button',{name:'הגדרות כלי למבוגר',exact:true}).click()
-  await page.getByLabel('מקור קלט').selectOption('web-midi')
-  await page.getByLabel('ייבוא כיוון מגן אחר').setInputFiles({name:'single-pad-software-fixture.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify({version:1,port:{id:'SEQUENCE-SOFTWARE-FIXTURE',name:'SEQUENCE SOFTWARE FIXTURE',manufacturer:'TEST'},pads:[{id:'blue',channel:10,note:50}]}))})
-  await page.getByText(/הפרופיל יובא/).waitFor()
-  await page.getByLabel('מקור קלט').selectOption('simulation')
-  await page.getByLabel('אופן המשחק').selectOption('sequence')
-  await page.getByLabel('רמת פתיחה').selectOption('2')
-  await page.getByRole('button',{name:'התחילו',exact:true}).click()
-  await page.locator('[data-turn="waiting"]').waitFor()
-  await page.getByRole('button',{name:'הדמיית ירוק — אמצע שמאל',exact:true}).click()
-  await page.getByRole('button',{name:'הדמיית כתום — אמצע ימין',exact:true}).click()
-  await page.locator('[data-turn="responded"]').waitFor()
-  await page.getByRole('button',{name:'הגדרות כלי למבוגר',exact:true}).click()
-  await page.getByLabel('מקור קלט').selectOption('web-midi')
-  assert.equal(await page.locator('[data-target-pad]').getAttribute('data-target-pad'),'blue')
-  await page.getByRole('button',{name:'בדקו כניסות קלט',exact:true}).click()
-  await page.getByText(/הכלי המוכר זוהה/).waitFor()
-  assert.equal(await page.getByRole('button',{name:'התחילו',exact:true}).isEnabled(),true)
-  await page.getByRole('button',{name:'התחילו',exact:true}).click()
-  await page.locator('[data-turn="waiting"]').waitFor()
-  await page.evaluate(()=>window.__sequenceFixture.port.send(50))
-  await page.locator('[data-turn="responded"]').waitFor()
-  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1))
-  assert.deepEqual(errors,[])
-  await context.close()
+  assert.equal(await page.evaluate(()=>window.__activeTones.size),0)
+  await button(page,'הרצף שוב').click();await page.locator('[data-turn="waiting"]').waitFor()
+  await page.evaluate(()=>window.__fixture.change(false));await page.locator('[data-turn="paused"]').waitFor()
+  await page.evaluate(()=>window.__fixture.change(true));assert.equal(await page.locator('[data-turn="paused"]').count(),1)
+  await options(page);await button(page,'אבחון ושמירת דוח למבוגר').click();await noScroll(page)
+  const pending=page.waitForEvent('download');await button(page,'הורידו דוח JSON').click()
+  const report=JSON.parse(readFileSync(await(await pending).path(),'utf8'))
+  assert.equal(report.physicalProof,'NOT_AUTOMATICALLY_VERIFIED');assert.equal(report.totals.gameResponses,6)
+  assert.ok(report.events.filter(e=>e.accepted).every(e=>e.padId===e.expectedPad&&e.sequenceRoundId&&e.uiCommitMs>=0))
+  await button(page,'יומן קלט').click();await noScroll(page);assert.equal(await page.locator('.turn-log li').count(),4)
+  await button(page,'הבא').click();await noScroll(page)
+  await button(page,'סגירת הגדרות הכלי').click()
+  await page.screenshot({path:`test-results/turn-taking-${viewport.width}.png`})
+  assert.deepEqual(errors,[]);await page.close()
  }
- console.log('PASS sequence SOFTWARE FIXTURE: 1–3 steps, ordered pad cues, wrong-pad retry, duplicate/note-off filtering, progression, stop/disconnect, coherent input/demo logs; NOT hardware evidence')
+ console.log('PASS rhythmic sequence software fixtures: four viewports without scroll, distinct pads, replay, clock timing, stop/disconnect, JSON. No physical hardware tested.')
 } finally {await browser.close()}
