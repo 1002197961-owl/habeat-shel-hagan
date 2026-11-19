@@ -216,7 +216,7 @@ export default function TurnTakingPage() {
     stop('ready'); setError('')
     if (!ready) { openSetup('connect'); return }
     const level = levelOverride ?? sequenceLevel
-    if (gameModeRef.current === 'sequence' && gamePads.length < level) { setError(`לרצף הזה צריך ${level} פדים שונים. כוונו עוד פד או בחרו רמה קצרה יותר.`); openSetup('calibrate'); return }
+    if (gameModeRef.current === 'sequence' && gamePads.length < level) { setSequenceLevel(level); updateRound(null); setError(`לרצף הזה צריך ${level} פדים שונים. כוונו עוד פד או בחרו רמה קצרה יותר.`); openSetup('calibrate'); return }
     if (gameModeRef.current === 'sequence' && !gamePads.length) { setError('בחרו לפחות פד מכויל אחד למשחק.'); return }
     const request = generation.current; setBusy(true)
     try {
