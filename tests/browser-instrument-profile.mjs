@@ -12,7 +12,7 @@ try {
  assert.equal(await page.evaluate(()=>localStorage.getItem('habeat.instrument-profile.v1')),null)
  await calibrate(page,'blue','תכלת 1 — שמאל חיצוני',38)
  await button(page,'הבא — למשחק').click();await noScroll(page)
- assert.ok(await page.getByLabel('רמת פתיחה').locator('option[value="3"]').isDisabled())
+ assert.ok(await page.getByLabel('רמת פתיחה').locator('option[value="3"]').evaluate(option => option.disabled))
  await page.getByLabel('מהירות ההדגמה').selectOption('650');await close(page)
  await button(page,'התחילו').click();await page.locator('[data-turn=waiting]').waitFor()
  await send(page,38);await page.locator('[data-turn=responded]').waitFor()
@@ -41,7 +41,7 @@ try {
  await button(page,'חיבור כלי MIDI').click();await button(page,'חיבור התופים').click()
  const confirm=button(page,'אישור מבוגר: התאימו פרופיל ל־SOFTWARE FIXTURE');await confirm.waitFor()
  page.once('dialog',d=>d.accept());await confirm.click();await button(page,'הכיוון נשמר — ממשיכים').click()
- assert.ok(await page.getByLabel('רמת פתיחה').locator('option[value="3"]').isDisabled())
+ assert.ok(await page.getByLabel('רמת פתיחה').locator('option[value="3"]').evaluate(option => option.disabled))
  // Native modal traps keyboard focus and Escape returns focus to its opener.
  await page.keyboard.press('Tab');assert.ok(await page.evaluate(()=>document.querySelector('dialog').contains(document.activeElement)))
  await page.keyboard.press('Escape');assert.equal(await page.getByRole('dialog').count(),0)
