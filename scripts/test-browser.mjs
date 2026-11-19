@@ -23,7 +23,7 @@ try {
   console.log(`LOCAL_QA_URL=${process.env.PREVIEW_TEST_URL}`)
   await new Promise(resolve=>{process.once('SIGINT',resolve);process.once('SIGTERM',resolve)})
  } else {
- for(const script of (process.argv.includes('--characters-only') ? ['tests/browser-characters.mjs'] : process.argv.includes('--capture-only') ? ['scripts/capture-screens.mjs'] : ['tests/browser-regression.mjs','tests/browser-instrument.mjs','tests/browser-instrument-profile.mjs','tests/browser-sequence.mjs','tests/browser-characters.mjs'])) {
+ for(const script of (process.argv.includes('--characters-only') ? ['tests/browser-characters.mjs'] : process.argv.includes('--capture-only') ? ['scripts/capture-screens.mjs'] : ['tests/browser-instrument.mjs','tests/browser-instrument-profile.mjs','tests/browser-sequence.mjs','tests/browser-regression.mjs','tests/browser-characters.mjs'])) {
   const result=await new Promise(resolve=>{const child=spawn(process.execPath,[script],{stdio:'inherit',env:process.env});child.on('exit',resolve)})
   if(result!==0){process.exitCode=result||1;break}
  }

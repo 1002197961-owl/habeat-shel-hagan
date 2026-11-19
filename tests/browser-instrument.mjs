@@ -24,7 +24,7 @@ try {
   const page=await browser.newPage()
   await page.addInitScript(s=>Object.defineProperty(navigator,'requestMIDIAccess',{value:s==='unsupported'?undefined:async()=>{throw Error('denied')},configurable:true}),scenario)
   await page.goto(base+'/turn-taking');await button(page,'התחילו').click();await button(page,'חיבור התופים').click()
-  await page.getByRole('alert').waitFor();await button(page,'ייבוא כיוון או הדמיית פיתוח').click()
+  await page.locator('dialog .turn-error[role=alert]').waitFor();await button(page,'ייבוא כיוון או הדמיית פיתוח').click()
   assert.equal(await page.getByLabel('מקור קלט').inputValue(),'web-midi');await page.close()
  }
  console.log('PASS simple turns, wrong-pad feedback, release/duplicate guards, explicit simulation, two actions, stop cancels sound, denied/unsupported MIDI; software only.')

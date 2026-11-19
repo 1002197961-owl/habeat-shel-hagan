@@ -15,7 +15,7 @@ try {
  assert.ok(await page.getByLabel('רמת פתיחה').locator('option[value="3"]').isDisabled())
  await button(page,'כיוון פדים').click()
  await button(page,'כיוון סגול — למטה ימין').click();await send(page,38)
- await page.getByRole('alert').waitFor()
+ await page.locator('dialog .turn-error[role=alert]').waitFor()
  assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('habeat.instrument-profile.v1')).pads.length),1)
  await calibrate(page,'purple','סגול — למטה ימין',43)
  await calibrate(page,'green','ירוק — אמצע שמאל',46)
