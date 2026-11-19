@@ -1,11 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { AppShell }      from '@/components/layout/AppShell'
 import { BackHeader }    from '@/components/layout/BackHeader'
 import { Card }          from '@/components/ui/Card'
-import { Btn }           from '@/components/ui/Btn'
 import { Pill }          from '@/components/ui/Pill'
 import { SectionHeader } from '@/components/ui/SectionHeader'
 import { BRAND }         from '@/lib/constants'
@@ -19,22 +19,14 @@ const STAGES = [
 const CHARS = ['🦊','🐰','🐻','🦁','🐸','🦋','🐼','🦄']
 const BGS   = ['🌲','🏠','🌈','🎪','🏖️','🌙','🏔️','🌸']
 
-const STEP_LABELS = ['בחרי דמות', 'בחרי רקע', 'בחרי שלב', 'יצרי קליפ']
+const STEP_LABELS = ['בחרי דמות', 'בחרי רקע', 'בחרי שלב', 'צלמי קליפ']
 
 export default function BehindScenesPage() {
   const [stage,   setStage]   = useState(0)
   const [char,    setChar]    = useState('🦊')
   const [bg,      setBg]      = useState('🌲')
   const [step,    setStep]    = useState(0)
-  const [exporting, setExp]   = useState(false)
-  const [done,    setDone]    = useState(false)
-
   const activeStage = STAGES[stage]
-
-  const handleExport = () => {
-    setExp(true)
-    setTimeout(() => { setExp(false); setDone(true) }, 2200)
-  }
 
   return (
     <AppShell bg="#f5f3ff">
@@ -176,40 +168,11 @@ export default function BehindScenesPage() {
           </Card>
         </motion.div>
 
-        {/* Export button */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.26 }}>
-          {done ? (
-            <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }}
-              style={{
-                background: `linear-gradient(135deg, ${BRAND.green}, #15803d)`,
-                borderRadius: 16, padding: '16px', textAlign: 'center',
-              }}>
-              <div style={{ fontSize: 32, marginBottom: 6 }}>🎉</div>
-              <div style={{ color: 'white', fontWeight: 900, fontSize: 16 }}>הקליפ מוכן!</div>
-              <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13, marginTop: 4 }}>
-                נשמר בספריית הקליפים שלך
-              </div>
-            </motion.div>
-          ) : (
-            <Btn full onClick={handleExport}
-              bg={exporting
-                ? `${BRAND.purple}88`
-                : `linear-gradient(135deg, ${BRAND.purple}, #5b21b6)`}
-              style={{
-                padding: '16px', fontSize: 17, borderRadius: 16,
-                boxShadow: `0 8px 24px ${BRAND.purple}55`,
-              }}>
-              {exporting ? (
-                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                  <motion.span animate={{ rotate: 360 }}
-                    transition={{ duration: 0.9, repeat: Infinity, ease: 'linear' }}
-                    style={{ display: 'inline-block' }}>🎬</motion.span>
-                  יוצר קליפ...
-                </span>
-              ) : '🎬 יצרי קליפ!'}
-            </Btn>
-          )}
-        </motion.div>
+        <div className="rounded-2xl bg-white p-4 text-center shadow-sm">
+          <p className="text-sm font-semibold" style={{color: BRAND.navy}}>בחרתם דמות, רקע ושלב לסיפור. כעת אפשר לצלם קליפ אמיתי באולפן.</p>
+          <p className="text-xs text-slate-600 mt-2">הבחירות כאן הן תכנון חזותי; הן עדיין אינן מוטמעות אוטומטית בסרטון.</p>
+          <Link href="/recording" className="inline-block mt-3 rounded-xl px-5 py-3 font-bold text-white" style={{background: BRAND.purple}}>🎬 מעבר לצילום</Link>
+        </div>
 
       </div>
     </AppShell>

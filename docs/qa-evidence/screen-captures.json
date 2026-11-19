@@ -1,0 +1,735 @@
+{
+  "version": {
+    "version": "hb-53a8ee95fcee",
+    "sourceFingerprint": "53a8ee95fcee032105ce03ff3754cfd1fc840126d0da373807bf716bef3cb154",
+    "sourceCommitAtBuild": "ce357adb427fff13f1fb32f45e9a21d02a12401e",
+    "workingTreeDirtyAtBuild": true,
+    "builtAt": "2026-09-27T11:13:06.491Z",
+    "repository": "1002197961-owl/habeat-shel-hagan",
+    "branch": "codex/audio-word-sync-integration"
+  },
+  "browser": "Chromium 153.0.8010.0 / Playwright 1.62.1",
+  "capturedAt": "2026-09-27T11:15:58.718Z",
+  "physicalDeviceTest": false,
+  "captures": [
+    {
+      "id": "01-home",
+      "title": "מסך הבית",
+      "audience": "משותף",
+      "note": "אין כיום הפרדת הרשאות בין ניווט ילד וגננת.",
+      "route": "/",
+      "file": "01-home.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "🎬 איך משחקים? הדרכה לילדים ולגננות",
+          "href": "/guide"
+        },
+        {
+          "label": "🎛️\nמנהל הביט",
+          "href": "/beat-manager"
+        },
+        {
+          "label": "⭐\nשיר הקסם",
+          "href": "/magic-song"
+        },
+        {
+          "label": "🎸\nתחנות נגינה",
+          "href": "/stations"
+        },
+        {
+          "label": "🎤\nהקלטה",
+          "href": "/recording"
+        },
+        {
+          "label": "📂\nספריית שירים",
+          "href": "/library"
+        },
+        {
+          "label": "🎬\nמאחורי הקלעים",
+          "href": "/behind-scenes"
+        },
+        {
+          "label": "📊\nדאשבורד עירוני",
+          "href": "/dashboard"
+        },
+        {
+          "label": "👩‍🏫\nמצב גננת",
+          "href": "/teacher"
+        }
+      ]
+    },
+    {
+      "id": "02-library",
+      "title": "ספריית השירים",
+      "audience": "ילד",
+      "note": "קטלוג אמיתי: שלושה קטעים מקוריים. מצב החיבור המופיע בצילום הוא המצב שהתקבל בפועל.",
+      "route": "/library",
+      "file": "02-library.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "←",
+          "href": "/"
+        },
+        {
+          "label": "🎬 צפו בהדרכת הספרייה",
+          "href": "/guide"
+        }
+      ]
+    },
+    {
+      "id": "03-library-reading",
+      "title": "הקראה מסונכרנת בספרייה",
+      "audience": "ילד",
+      "note": "קובץ MP3 המקורי; הצילום נעשה בזמן ניגון, ללא שינוי שעון הנגן.",
+      "route": "/library",
+      "file": "03-library-reading.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "←",
+          "href": "/"
+        },
+        {
+          "label": "🎬 צפו בהדרכת הספרייה",
+          "href": "/guide"
+        }
+      ]
+    },
+    {
+      "id": "magic-1",
+      "title": "שיר הקסם — שאלה 1",
+      "audience": "ילד",
+      "note": "",
+      "route": "/magic-song",
+      "file": "magic-1.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "←",
+          "href": "/"
+        }
+      ]
+    },
+    {
+      "id": "magic-2",
+      "title": "שיר הקסם — שאלה 2",
+      "audience": "ילד",
+      "note": "",
+      "route": "/magic-song",
+      "file": "magic-2.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "←",
+          "href": "/"
+        }
+      ]
+    },
+    {
+      "id": "magic-3",
+      "title": "שיר הקסם — שאלה 3",
+      "audience": "ילד",
+      "note": "",
+      "route": "/magic-song",
+      "file": "magic-3.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "←",
+          "href": "/"
+        }
+      ]
+    },
+    {
+      "id": "magic-4",
+      "title": "שיר הקסם — שאלה 4",
+      "audience": "ילד",
+      "note": "",
+      "route": "/magic-song",
+      "file": "magic-4.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "←",
+          "href": "/"
+        }
+      ]
+    },
+    {
+      "id": "magic-5",
+      "title": "שיר הקסם — שאלה 5",
+      "audience": "ילד",
+      "note": "",
+      "route": "/magic-song",
+      "file": "magic-5.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "←",
+          "href": "/"
+        }
+      ]
+    },
+    {
+      "id": "magic-6",
+      "title": "שיר הקסם — שאלה 6",
+      "audience": "ילד",
+      "note": "",
+      "route": "/magic-song",
+      "file": "magic-6.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "←",
+          "href": "/"
+        }
+      ]
+    },
+    {
+      "id": "magic-7",
+      "title": "שיר הקסם — שאלה 7",
+      "audience": "ילד",
+      "note": "",
+      "route": "/magic-song",
+      "file": "magic-7.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "←",
+          "href": "/"
+        }
+      ]
+    },
+    {
+      "id": "magic-8",
+      "title": "שיר הקסם — שאלה 8",
+      "audience": "ילד",
+      "note": "",
+      "route": "/magic-song",
+      "file": "magic-8.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "←",
+          "href": "/"
+        }
+      ]
+    },
+    {
+      "id": "magic-9",
+      "title": "שיר הקסם — שאלה 9",
+      "audience": "ילד",
+      "note": "",
+      "route": "/magic-song",
+      "file": "magic-9.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "←",
+          "href": "/"
+        }
+      ]
+    },
+    {
+      "id": "magic-10",
+      "title": "שיר הקסם — שאלה 10",
+      "audience": "ילד",
+      "note": "",
+      "route": "/magic-song",
+      "file": "magic-10.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "←",
+          "href": "/"
+        }
+      ]
+    },
+    {
+      "id": "magic-result",
+      "title": "שיר הקסם — מילים בלבד",
+      "audience": "ילד",
+      "note": "אין לחן או הקלטת שירה; ההקראה הדינמית היא קול דפדפן.",
+      "route": "/magic-song",
+      "file": "magic-result.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "←",
+          "href": "/"
+        },
+        {
+          "label": "🎤 להקלטה",
+          "href": "/recording"
+        }
+      ]
+    },
+    {
+      "id": "guide-child",
+      "title": "הדרכה לילדים",
+      "audience": "ילד",
+      "note": "",
+      "route": "/guide",
+      "file": "guide-child.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "→ חזרה לבית",
+          "href": "/"
+        },
+        {
+          "label": "נסו עכשיו ←",
+          "href": "/"
+        },
+        {
+          "label": "נסו עכשיו ←",
+          "href": "/library"
+        },
+        {
+          "label": "נסו עכשיו ←",
+          "href": "/magic-song"
+        }
+      ]
+    },
+    {
+      "id": "guide-teacher",
+      "title": "הדרכה לגננות",
+      "audience": "גננת",
+      "note": "",
+      "route": "/guide",
+      "file": "guide-teacher.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "→ חזרה לבית",
+          "href": "/"
+        },
+        {
+          "label": "נסו עכשיו ←",
+          "href": "/teacher"
+        },
+        {
+          "label": "נסו עכשיו ←",
+          "href": "/beat-manager"
+        },
+        {
+          "label": "נסו עכשיו ←",
+          "href": "/recording"
+        }
+      ]
+    },
+    {
+      "id": "recording-audio",
+      "title": "אולפן — הקלטת קול",
+      "audience": "משותף",
+      "note": "מצב התחלתי. אין כאן בדיקת מיקרופון פיזי.",
+      "route": "/recording",
+      "file": "recording-audio.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "←",
+          "href": "/"
+        },
+        {
+          "label": "🎬 איך מקליטים?",
+          "href": "/guide"
+        }
+      ]
+    },
+    {
+      "id": "recording-video",
+      "title": "אולפן — הקלטת וידאו",
+      "audience": "משותף",
+      "note": "מצב התחלתי. מצלמה לא הופעלה.",
+      "route": "/recording",
+      "file": "recording-video.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "←",
+          "href": "/"
+        },
+        {
+          "label": "🎬 איך מקליטים?",
+          "href": "/guide"
+        }
+      ]
+    },
+    {
+      "id": "teacher",
+      "title": "מצב גננת",
+      "audience": "גננת",
+      "note": "נתוני הילדים והתחנות הם נתוני הדגמה קיימים.",
+      "route": "/teacher",
+      "file": "teacher.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "←",
+          "href": "/"
+        },
+        {
+          "label": "🎬 הדרכת גננות",
+          "href": "/guide?audience=teachers"
+        },
+        {
+          "label": "התור שלי, התור שלך — בדיקת חיבור כלי",
+          "href": "/turn-taking"
+        }
+      ]
+    },
+    {
+      "id": "beat-manager",
+      "title": "מנהל הביט",
+      "audience": "גננת",
+      "note": "טיימר ונתוני פעילות להדגמה; אינם חיבור ציוד.",
+      "route": "/beat-manager",
+      "file": "beat-manager.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "←",
+          "href": "/"
+        }
+      ]
+    },
+    {
+      "id": "beat-song",
+      "title": "מנהל הביט — בחירת שיר",
+      "audience": "גננת",
+      "note": "בחירת נתון הדגמה אינה פרסום הקלטת שיר מוכר.",
+      "route": "/beat-manager",
+      "file": "beat-song.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "←",
+          "href": "#"
+        },
+        {
+          "label": "🎬 איך מנחים פעילות?",
+          "href": "/guide?audience=teachers"
+        }
+      ]
+    },
+    {
+      "id": "beat-rhythm",
+      "title": "מנהל הביט — תרגול קצב",
+      "audience": "גננת",
+      "note": "תרגול צבעים קיים, ללא אימות נגינה מהכלי.",
+      "route": "/beat-manager",
+      "file": "beat-rhythm.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "←",
+          "href": "#"
+        }
+      ]
+    },
+    {
+      "id": "beat-instruments",
+      "title": "מנהל הביט — בחירת כלים",
+      "audience": "גננת",
+      "note": "בחירת כלי ברשימה אינה זיהוי התקן פיזי.",
+      "route": "/beat-manager",
+      "file": "beat-instruments.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "←",
+          "href": "#"
+        }
+      ]
+    },
+    {
+      "id": "stations",
+      "title": "תחנות נגינה",
+      "audience": "גננת",
+      "note": "נתוני תחנות להדגמה.",
+      "route": "/stations",
+      "file": "stations.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "←",
+          "href": "/"
+        }
+      ]
+    },
+    {
+      "id": "behind-scenes",
+      "title": "מאחורי הקלעים",
+      "audience": "משותף",
+      "note": "",
+      "route": "/behind-scenes",
+      "file": "behind-scenes.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "←",
+          "href": "/"
+        },
+        {
+          "label": "🎬 מעבר לצילום",
+          "href": "/recording"
+        }
+      ]
+    },
+    {
+      "id": "dashboard",
+      "title": "דאשבורד עירוני",
+      "audience": "גננת",
+      "note": "נתוני הדגמה; אין להסיק פעילות אמת מהמדדים.",
+      "route": "/dashboard",
+      "file": "dashboard.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "←",
+          "href": "/"
+        }
+      ]
+    },
+    {
+      "id": "input-disconnected",
+      "title": "משחק ואבחון — ללא כלי מחובר",
+      "audience": "גננת",
+      "note": "לא התבקשה הרשאת ציוד, ואין יחידה פיזית מחוברת.",
+      "route": "/turn-taking",
+      "file": "input-disconnected.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "חזרה למצב גננת",
+          "href": "/teacher"
+        }
+      ]
+    },
+    {
+      "id": "turn-sim-ready",
+      "title": "משחק — הדמיה מוכנה",
+      "audience": "ילד",
+      "note": "הדמיית תוכנה בלבד. ההנחיה היא של פעולה אחת.",
+      "route": "/turn-taking",
+      "file": "turn-sim-ready.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "חזרה למצב גננת",
+          "href": "/teacher"
+        }
+      ]
+    },
+    {
+      "id": "turn-sim-wait",
+      "title": "משחק — תור הילד",
+      "audience": "ילד",
+      "note": "הדמיה; לאחר צליל הדגמה אחד.",
+      "route": "/turn-taking",
+      "file": "turn-sim-wait.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "חזרה למצב גננת",
+          "href": "/teacher"
+        }
+      ]
+    },
+    {
+      "id": "turn-sim-one",
+      "title": "משחק — נקלטה פעולה אחת",
+      "audience": "ילד",
+      "note": "אירוע אחד משלים משימת פעולה אחת; דיוק קצבי אינו נמדד.",
+      "route": "/turn-taking",
+      "file": "turn-sim-one.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "חזרה למצב גננת",
+          "href": "/teacher"
+        }
+      ]
+    },
+    {
+      "id": "turn-sim-two-partial",
+      "title": "משחק — פעולה ראשונה מתוך שתיים",
+      "audience": "ילד",
+      "note": "הפעולה נקלטה, אך המשימה עדיין לא הושלמה.",
+      "route": "/turn-taking",
+      "file": "turn-sim-two-partial.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "חזרה למצב גננת",
+          "href": "/teacher"
+        }
+      ]
+    },
+    {
+      "id": "turn-sim-two-complete",
+      "title": "משחק — שתי פעולות",
+      "audience": "ילד",
+      "note": "הושלם מספר פעולות; אין טענה לדיוק בקצב או לחומרה.",
+      "route": "/turn-taking",
+      "file": "turn-sim-two-complete.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "חזרה למצב גננת",
+          "href": "/teacher"
+        }
+      ]
+    },
+    {
+      "id": "input-simulation-log",
+      "title": "אבחון — יומן הדמיה מלא",
+      "audience": "גננת",
+      "note": "שדות ציוד ריקים במכוון. זמני הדפדפן אינם השהיה פיזית.",
+      "route": "/turn-taking",
+      "file": "input-simulation-log.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "fullPage": true,
+      "links": [
+        {
+          "label": "חזרה למצב גננת",
+          "href": "/teacher"
+        }
+      ]
+    }
+  ]
+}

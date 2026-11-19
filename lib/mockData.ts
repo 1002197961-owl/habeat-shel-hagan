@@ -1,5 +1,15 @@
+export type BeatColor = 'red' | 'yellow' | 'blue' | 'green' | 'purple' | 'rest'
+export const BEAT_COLORS: Record<BeatColor, { label: string; color: string; instrument: string }> = {
+  red: { label: 'אדום', color: '#ef4444', instrument: 'תוף' },
+  yellow: { label: 'צהוב', color: '#eab308', instrument: 'מחיאת כף' },
+  blue: { label: 'כחול', color: '#3b82f6', instrument: 'שירה' },
+  green: { label: 'ירוק', color: '#22c55e', instrument: 'גיטרה' },
+  purple: { label: 'סגול', color: '#9333ea', instrument: 'קלידים' },
+  rest: { label: 'הפסקה', color: '#9ca3af', instrument: 'שקט' },
+}
 export interface Song {
   id: number; title: string; artist: string; duration: string; emoji: string; color: string
+  difficulty?: 'easy' | 'medium' | 'hard'; pattern?: BeatColor[]
 }
 export interface Garden {
   id: number; name: string; city: string; kids: number; songs: number; clips: number; progress: number
@@ -13,12 +23,9 @@ export interface Clip {
 }
 
 export const MOCK_SONGS: Song[] = [
-  { id: 1, title: 'שיר הגשם',       artist: 'גן שושנים',  duration: '2:34', emoji: '🌧️', color: '#00B4E6' },
-  { id: 2, title: 'ריקוד הכוכבים',  artist: 'גן הדר',      duration: '1:58', emoji: '⭐', color: '#FFD600' },
-  { id: 3, title: 'הגיטרה הורודה',  artist: 'גן פרחים',    duration: '3:12', emoji: '🎸', color: '#FF4DA6' },
-  { id: 4, title: 'צבעי הקשת',      artist: 'גן תמר',      duration: '2:45', emoji: '🌈', color: '#FFA500' },
-  { id: 5, title: 'מסע הצלילים',    artist: 'גן עדן',       duration: '2:20', emoji: '🎵', color: '#8B5CF6' },
-  { id: 6, title: 'שיר הבוקר',     artist: 'גן שמש',       duration: '1:45', emoji: '☀️', color: '#22C55E' },
+  { id: 1, title: 'בוקר של צלילים', artist: 'קטע מקורי · הביט של הגן', duration: '0:19', emoji: '☀️', color: '#FFD600', difficulty: 'easy', pattern: ['red','yellow','blue','yellow','red','green','blue','rest'] },
+  { id: 2, title: 'טיפות רוקדות', artist: 'קטע מקורי · הביט של הגן', duration: '0:24', emoji: '🌧️', color: '#00B4E6', difficulty: 'easy', pattern: ['blue','yellow','blue','rest','green','blue','yellow','rest'] },
+  { id: 3, title: 'מצעד הצבעים', artist: 'קטע מקורי · הביט של הגן', duration: '0:16', emoji: '🎨', color: '#FF4DA6', difficulty: 'easy', pattern: ['red','yellow','blue','green','purple','yellow','red','rest'] },
 ]
 
 export const MOCK_GARDENS: Garden[] = [

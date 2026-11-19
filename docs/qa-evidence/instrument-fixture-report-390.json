@@ -1,0 +1,236 @@
+{
+  "testType": "AUTOMATED SOFTWARE FIXTURE — NO PHYSICAL DEVICE",
+  "report": {
+    "schema": 2,
+    "createdAt": "2026-09-27T11:14:49.774Z",
+    "version": "hb-53a8ee95fcee",
+    "url": "http://127.0.0.1:38671/turn-taking",
+    "browser": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.0 Safari/537.36",
+    "language": "en-US@posix",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "capability": "Web MIDI זמין לבקשת הרשאה",
+    "equipment": "",
+    "targetDevice": "",
+    "physicalProof": "NOT_AUTOMATICALLY_VERIFIED",
+    "observation": {
+      "physicalActionCount": null,
+      "notes": ""
+    },
+    "mode": "web-midi",
+    "mapping": {
+      "portId": "test-software-port",
+      "channel": 1,
+      "note": 60
+    },
+    "ports": [
+      {
+        "id": "test-software-port",
+        "name": "TEST SOFTWARE PORT",
+        "manufacturer": "AUTOMATED FIXTURE",
+        "state": "connected"
+      }
+    ],
+    "connections": [
+      {
+        "at": "2026-09-27T11:14:48.588Z",
+        "ports": [
+          {
+            "id": "test-software-port",
+            "name": "TEST SOFTWARE PORT",
+            "manufacturer": "AUTOMATED FIXTURE",
+            "state": "connected"
+          }
+        ]
+      },
+      {
+        "at": "2026-09-27T11:14:48.570Z",
+        "ports": []
+      }
+    ],
+    "targetActions": 1,
+    "rhythmAccuracy": "NOT_ASSESSED",
+    "totals": {
+      "messages": 6,
+      "mappedNoteOns": 3,
+      "identicalDuplicateDeliveries": 1,
+      "feedbackResponses": 3,
+      "gameResponses": 2,
+      "completedRounds": 2,
+      "omittedFromLog": 0
+    },
+    "timingMeaning": "receivedAt is browser wall time. receivedMs and browserEventMs use the browser monotonic clock, not a hardware clock. uiCommitMs is JS-to-DOM commit, not paint or physical-to-screen latency. audioScheduledMs is scheduling, not sound heard. Missed physical actions and end-to-end latency require external observation.",
+    "events": [
+      {
+        "id": 2,
+        "source": "web-midi",
+        "port": {
+          "id": "test-software-port",
+          "name": "TEST SOFTWARE PORT",
+          "manufacturer": "AUTOMATED FIXTURE",
+          "state": "connected"
+        },
+        "bytes": [
+          144,
+          61,
+          100
+        ],
+        "receivedMs": 3078,
+        "receivedAt": "2026-09-27T11:14:47.693Z",
+        "browserEventMs": 3078,
+        "kind": "note-on",
+        "channel": 1,
+        "note": 61,
+        "velocity": 100,
+        "duplicate": false,
+        "accepted": false,
+        "feedback": false,
+        "decision": "unmapped",
+        "taskOutcome": "not-counted"
+      },
+      {
+        "id": 3,
+        "source": "web-midi",
+        "port": {
+          "id": "test-software-port",
+          "name": "TEST SOFTWARE PORT",
+          "manufacturer": "AUTOMATED FIXTURE",
+          "state": "connected"
+        },
+        "bytes": [
+          144,
+          60,
+          0
+        ],
+        "receivedMs": 3078.10000000149,
+        "receivedAt": "2026-09-27T11:14:47.693Z",
+        "browserEventMs": 3078.1,
+        "kind": "note-off",
+        "channel": 1,
+        "note": 60,
+        "velocity": 0,
+        "duplicate": false,
+        "accepted": false,
+        "feedback": false,
+        "decision": "note-off",
+        "taskOutcome": "not-counted"
+      },
+      {
+        "id": 4,
+        "source": "web-midi",
+        "port": {
+          "id": "test-software-port",
+          "name": "TEST SOFTWARE PORT",
+          "manufacturer": "AUTOMATED FIXTURE",
+          "state": "connected"
+        },
+        "bytes": [
+          144,
+          60,
+          100
+        ],
+        "receivedMs": 3084.800000000745,
+        "receivedAt": "2026-09-27T11:14:47.700Z",
+        "browserEventMs": 3084.699999999255,
+        "kind": "note-on",
+        "channel": 1,
+        "note": 60,
+        "velocity": 100,
+        "duplicate": false,
+        "accepted": true,
+        "feedback": true,
+        "decision": "turn-response",
+        "taskOutcome": "completed",
+        "audioScheduledMs": 0.6000000014901161,
+        "uiCommitMs": 2.699999999254942
+      },
+      {
+        "id": 5,
+        "source": "web-midi",
+        "port": {
+          "id": "test-software-port",
+          "name": "TEST SOFTWARE PORT",
+          "manufacturer": "AUTOMATED FIXTURE",
+          "state": "connected"
+        },
+        "bytes": [
+          144,
+          60,
+          100
+        ],
+        "receivedMs": 3085.5,
+        "receivedAt": "2026-09-27T11:14:47.701Z",
+        "browserEventMs": 3084.699999999255,
+        "kind": "note-on",
+        "channel": 1,
+        "note": 60,
+        "velocity": 100,
+        "duplicate": true,
+        "accepted": false,
+        "feedback": false,
+        "decision": "duplicate-delivery",
+        "taskOutcome": "not-counted"
+      },
+      {
+        "id": 6,
+        "source": "web-midi",
+        "port": {
+          "id": "test-software-port",
+          "name": "TEST SOFTWARE PORT",
+          "manufacturer": "AUTOMATED FIXTURE",
+          "state": "connected"
+        },
+        "bytes": [
+          144,
+          60,
+          100
+        ],
+        "receivedMs": 3085.60000000149,
+        "receivedAt": "2026-09-27T11:14:47.701Z",
+        "browserEventMs": 3084.709999999255,
+        "kind": "note-on",
+        "channel": 1,
+        "note": 60,
+        "velocity": 100,
+        "duplicate": false,
+        "accepted": false,
+        "feedback": true,
+        "decision": "outside-turn",
+        "taskOutcome": "not-counted",
+        "audioScheduledMs": 0.09999999776482582,
+        "uiCommitMs": 1.8999999985098839
+      },
+      {
+        "id": 7,
+        "source": "web-midi",
+        "port": {
+          "id": "test-software-port",
+          "name": "TEST SOFTWARE PORT",
+          "manufacturer": "AUTOMATED FIXTURE",
+          "state": "connected"
+        },
+        "bytes": [
+          144,
+          60,
+          100
+        ],
+        "receivedMs": 4844.900000002235,
+        "receivedAt": "2026-09-27T11:14:49.460Z",
+        "browserEventMs": 4844.800000000745,
+        "kind": "note-on",
+        "channel": 1,
+        "note": 60,
+        "velocity": 100,
+        "duplicate": false,
+        "accepted": true,
+        "feedback": true,
+        "decision": "turn-response",
+        "taskOutcome": "completed",
+        "audioScheduledMs": 0.3999999985098839,
+        "uiCommitMs": 2.199999999254942
+      }
+    ]
+  }
+}

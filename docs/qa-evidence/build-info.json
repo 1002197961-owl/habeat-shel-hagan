@@ -1,0 +1,9 @@
+{
+  "version": "hb-53a8ee95fcee",
+  "sourceFingerprint": "53a8ee95fcee032105ce03ff3754cfd1fc840126d0da373807bf716bef3cb154",
+  "sourceCommitAtBuild": "ce357adb427fff13f1fb32f45e9a21d02a12401e",
+  "workingTreeDirtyAtBuild": true,
+  "builtAt": "2026-09-27T11:13:06.491Z",
+  "repository": "1002197961-owl/habeat-shel-hagan",
+  "branch": "codex/audio-word-sync-integration"
+}

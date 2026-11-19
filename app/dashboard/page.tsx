@@ -27,6 +27,7 @@ export default function DashboardPage() {
     <AppShell bg="#eef2ff">
       <BackHeader title="דאשבורד עירוני 📊" bg={BRAND.navy} />
       <div className="p-4 space-y-3">
+        <p className="rounded-xl bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-950">גרסת הדגמה: נתוני הילדים והתחנות במסך זה להמחשה בלבד.</p>
 
         {/* Stat cards */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>

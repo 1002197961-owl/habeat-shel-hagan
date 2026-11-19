@@ -1,0 +1,301 @@
+[
+  {
+    "snapshot": {
+      "songs": [
+        {
+          "id": "garden-hello",
+          "title": "בוקר של צלילים",
+          "artist": "הביט של הגן · קטע מקורי ללא שירה",
+          "category": "movement",
+          "difficulty": "easy",
+          "age_level": "3-6",
+          "bpm": 100,
+          "duration_sec": 19.2,
+          "emoji": "☀️",
+          "color": "#FFA500",
+          "pattern": [
+            "red",
+            "rest",
+            "yellow",
+            "rest"
+          ],
+          "description": "מתחילים בפעימה קבועה, ומצטרפים במחיאה בכל פעימה שנייה.",
+          "builtin_audio_id": "garden-hello",
+          "audio_object_path": null,
+          "rights_status": "cleared",
+          "rights_note": "Original instrumental score authored for the Habeat demo; no third-party recording.",
+          "published": true,
+          "sort_order": 0,
+          "created_at": "2026-09-18T16:46:01.67668+00:00"
+        },
+        {
+          "id": "rain-dance",
+          "title": "טיפות רוקדות",
+          "artist": "הביט של הגן · קטע מקורי ללא שירה",
+          "category": "nature",
+          "difficulty": "easy",
+          "age_level": "3-6",
+          "bpm": 80,
+          "duration_sec": 24,
+          "emoji": "💧",
+          "color": "#00B4E6",
+          "pattern": [
+            "purple",
+            "rest",
+            "blue",
+            "rest"
+          ],
+          "description": "מקשיבים לטיפות, מנגנים בעדינות ומשאירים מקום לשקט.",
+          "builtin_audio_id": "rain-dance",
+          "audio_object_path": null,
+          "rights_status": "cleared",
+          "rights_note": "Original instrumental score authored for the Habeat demo; no third-party recording.",
+          "published": true,
+          "sort_order": 1,
+          "created_at": "2026-09-18T16:46:01.67668+00:00"
+        },
+        {
+          "id": "color-parade",
+          "title": "מצעד הצבעים",
+          "artist": "הביט של הגן · קטע מקורי ללא שירה",
+          "category": "movement",
+          "difficulty": "easy",
+          "age_level": "3-6",
+          "bpm": 120,
+          "duration_sec": 16,
+          "emoji": "🌈",
+          "color": "#8B5CF6",
+          "pattern": [
+            "red",
+            "yellow",
+            "purple",
+            "rest"
+          ],
+          "description": "מעבירים את הפעימה בין שלושה כלים ועוצרים יחד בהפסקה.",
+          "builtin_audio_id": "color-parade",
+          "audio_object_path": null,
+          "rights_status": "cleared",
+          "rights_note": "Original instrumental score authored for the Habeat demo; no third-party recording.",
+          "published": true,
+          "sort_order": 2,
+          "created_at": "2026-09-18T16:46:01.67668+00:00"
+        },
+        {
+          "id": "im-ata-sameach",
+          "title": "אם אתה שמח",
+          "artist": "שיר מוכר · קובץ שמע טרם נוסף",
+          "category": "movement",
+          "difficulty": "easy",
+          "age_level": "3-6",
+          "bpm": 120,
+          "duration_sec": null,
+          "emoji": "😊",
+          "color": "#FFD600",
+          "pattern": [
+            "red",
+            "yellow",
+            "red",
+            "blue"
+          ],
+          "description": "פריט לתכנון הספרייה. השמעה תיפתח לאחר הוספת הקלטה מאושרת לשימוש.",
+          "builtin_audio_id": null,
+          "audio_object_path": null,
+          "rights_status": "pending",
+          "rights_note": null,
+          "published": true,
+          "sort_order": 3,
+          "created_at": "2026-09-18T16:46:01.67668+00:00"
+        },
+        {
+          "id": "yonatan-hakatan",
+          "title": "יונתן הקטן",
+          "artist": "שיר מוכר · קובץ שמע טרם נוסף",
+          "category": "animals",
+          "difficulty": "medium",
+          "age_level": "3-5",
+          "bpm": 108,
+          "duration_sec": null,
+          "emoji": "🐑",
+          "color": "#8B5CF6",
+          "pattern": [
+            "purple",
+            "red",
+            "yellow",
+            "blue"
+          ],
+          "description": "פריט לתכנון הספרייה. השמעה תיפתח לאחר הוספת הקלטה מאושרת לשימוש.",
+          "builtin_audio_id": null,
+          "audio_object_path": null,
+          "rights_status": "pending",
+          "rights_note": null,
+          "published": true,
+          "sort_order": 4,
+          "created_at": "2026-09-18T16:46:01.67668+00:00"
+        },
+        {
+          "id": "ledavid-moshe",
+          "title": "לדוד משה הייתה חווה",
+          "artist": "שיר מוכר · קובץ שמע טרם נוסף",
+          "category": "animals",
+          "difficulty": "hard",
+          "age_level": "4-6",
+          "bpm": 100,
+          "duration_sec": null,
+          "emoji": "🐄",
+          "color": "#22C55E",
+          "pattern": [
+            "red",
+            "yellow",
+            "red",
+            "yellow",
+            "blue",
+            "red",
+            "yellow",
+            "green"
+          ],
+          "description": "פריט לתכנון הספרייה. השמעה תיפתח לאחר הוספת הקלטה מאושרת לשימוש.",
+          "builtin_audio_id": null,
+          "audio_object_path": null,
+          "rights_status": "pending",
+          "rights_note": null,
+          "published": true,
+          "sort_order": 5,
+          "created_at": "2026-09-18T16:46:01.67668+00:00"
+        },
+        {
+          "id": "yadayim-lemaala",
+          "title": "ידיים למעלה",
+          "artist": "שיר מוכר · קובץ שמע טרם נוסף",
+          "category": "movement",
+          "difficulty": "easy",
+          "age_level": "3-5",
+          "bpm": 130,
+          "duration_sec": null,
+          "emoji": "🙌",
+          "color": "#FF4DA6",
+          "pattern": [
+            "red",
+            "yellow",
+            "red",
+            "yellow"
+          ],
+          "description": "פריט לתכנון הספרייה. השמעה תיפתח לאחר הוספת הקלטה מאושרת לשימוש.",
+          "builtin_audio_id": null,
+          "audio_object_path": null,
+          "rights_status": "pending",
+          "rights_note": null,
+          "published": true,
+          "sort_order": 6,
+          "created_at": "2026-09-18T16:46:01.67668+00:00"
+        },
+        {
+          "id": "ken-latzipor",
+          "title": "קן לציפור",
+          "artist": "שיר מוכר · קובץ שמע טרם נוסף",
+          "category": "nature",
+          "difficulty": "medium",
+          "age_level": "4-6",
+          "bpm": 96,
+          "duration_sec": null,
+          "emoji": "🐦",
+          "color": "#00B4E6",
+          "pattern": [
+            "green",
+            "blue",
+            "green",
+            "blue",
+            "yellow",
+            "rest"
+          ],
+          "description": "פריט לתכנון הספרייה. השמעה תיפתח לאחר הוספת הקלטה מאושרת לשימוש.",
+          "builtin_audio_id": null,
+          "audio_object_path": null,
+          "rights_status": "pending",
+          "rights_note": null,
+          "published": true,
+          "sort_order": 7,
+          "created_at": "2026-09-18T16:46:01.67668+00:00"
+        }
+      ],
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "text"
+        },
+        {
+          "column_name": "title",
+          "data_type": "text"
+        },
+        {
+          "column_name": "artist",
+          "data_type": "text"
+        },
+        {
+          "column_name": "category",
+          "data_type": "text"
+        },
+        {
+          "column_name": "difficulty",
+          "data_type": "text"
+        },
+        {
+          "column_name": "age_level",
+          "data_type": "text"
+        },
+        {
+          "column_name": "bpm",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "duration_sec",
+          "data_type": "double precision"
+        },
+        {
+          "column_name": "emoji",
+          "data_type": "text"
+        },
+        {
+          "column_name": "color",
+          "data_type": "text"
+        },
+        {
+          "column_name": "pattern",
+          "data_type": "ARRAY"
+        },
+        {
+          "column_name": "description",
+          "data_type": "text"
+        },
+        {
+          "column_name": "builtin_audio_id",
+          "data_type": "text"
+        },
+        {
+          "column_name": "audio_object_path",
+          "data_type": "text"
+        },
+        {
+          "column_name": "rights_status",
+          "data_type": "text"
+        },
+        {
+          "column_name": "rights_note",
+          "data_type": "text"
+        },
+        {
+          "column_name": "published",
+          "data_type": "boolean"
+        },
+        {
+          "column_name": "sort_order",
+          "data_type": "integer"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone"
+        }
+      ],
+      "recordings": null
+    }
+  }
+]

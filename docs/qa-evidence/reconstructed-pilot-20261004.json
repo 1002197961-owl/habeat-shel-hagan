@@ -1,0 +1,36 @@
+{
+  "checkedAt": "2026-10-04T06:04:18.343767+00:00",
+  "reconstruction": true,
+  "baselineCommit": "0f2caad9e049511c07d11c2998784470ad38115b",
+  "version": "hb-18f8f1c72887",
+  "sourceFingerprint": "18f8f1c7288706583e7bfbef88fdf6b80aaa71bb173f30e0f344277c7ddf5f30",
+  "unitTests": {
+    "passed": 50,
+    "failed": 0,
+    "skipped": 0
+  },
+  "typecheck": "PASS",
+  "optimizedStaticBuild": "PASS",
+  "browserScriptSyntax": "PASS",
+  "diffWhitespace": "PASS",
+  "staticExportInspection": {
+    "status": "PASS",
+    "verified": "static export files and initial HTML only; browser behavior not verified",
+    "routes": 5,
+    "approvedIcons": 11,
+    "approvedFronts": [
+      "G",
+      "M",
+      "R"
+    ],
+    "fullReferenceSheetsExported": false,
+    "initialGameImages": 7
+  },
+  "browserE2E": "BLOCKED_BEFORE_ASSERTIONS: Chromium process socket denied in returned environment; WebKit not run",
+  "physicalHardware": "NOT_TESTED",
+  "lint": "NOT_RUN: repository configuration absent",
+  "liveSupabaseRequests": 0,
+  "remoteWrites": 0,
+  "newGeneration": false,
+  "evidenceScope": "Historical reconstruction checks; sanitized candidate requires its own fresh verification."
+}

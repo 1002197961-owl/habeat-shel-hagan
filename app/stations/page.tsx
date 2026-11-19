@@ -26,6 +26,7 @@ export default function StationsPage() {
     <AppShell bg="#fff0f8">
       <BackHeader title="תחנות כלי נגינה 🎸" bg={BRAND.pink} />
       <div className="p-4 space-y-3">
+        <p className="rounded-xl bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-950">גרסת הדגמה: נתוני הילדים והתחנות במסך זה להמחשה בלבד.</p>
 
         <motion.div className="flex gap-3"
           initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.04 }}>

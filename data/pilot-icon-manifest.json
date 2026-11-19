@@ -1,0 +1,226 @@
+{
+  "variants": [
+    {
+      "priority": "1",
+      "interfaceKey": "pilot.play",
+      "iconId": "CORE-PLAY",
+      "nameHe": "נגינה / הפעלה",
+      "accessibilityLabel": "התחלת נגינה",
+      "scale": "standard",
+      "pixelSize": "96",
+      "state": "idle",
+      "png": "assets/png/play_standard_idle.png",
+      "webp": "assets/webp/play_standard_idle.webp",
+      "lightQa": "true",
+      "navyQa": "true",
+      "source": "existing"
+    },
+    {
+      "priority": "2",
+      "interfaceKey": "pilot.stop",
+      "iconId": "CORE-STOP",
+      "nameHe": "עצירה",
+      "accessibilityLabel": "עצירת הנגינה",
+      "scale": "standard",
+      "pixelSize": "96",
+      "state": "idle",
+      "png": "assets/png/stop_standard_idle.png",
+      "webp": "assets/webp/stop_standard_idle.webp",
+      "lightQa": "true",
+      "navyQa": "true",
+      "source": "added-v1.1"
+    },
+    {
+      "priority": "3",
+      "interfaceKey": "pilot.hearAgain",
+      "iconId": "CORE-HEAR-AGAIN",
+      "nameHe": "שמע שוב",
+      "accessibilityLabel": "שמיעת ההוראה שוב",
+      "scale": "standard",
+      "pixelSize": "96",
+      "state": "idle",
+      "png": "assets/png/hear-again_standard_idle.png",
+      "webp": "assets/webp/hear-again_standard_idle.webp",
+      "lightQa": "true",
+      "navyQa": "true",
+      "source": "existing"
+    },
+    {
+      "priority": "4",
+      "interfaceKey": "pilot.hint",
+      "iconId": "CORE-HINT",
+      "nameHe": "רמז",
+      "accessibilityLabel": "קבלת רמז",
+      "scale": "standard",
+      "pixelSize": "96",
+      "state": "idle",
+      "png": "assets/png/hint_standard_idle.png",
+      "webp": "assets/webp/hint_standard_idle.webp",
+      "lightQa": "true",
+      "navyQa": "true",
+      "source": "existing"
+    },
+    {
+      "priority": "5",
+      "interfaceKey": "nav.home",
+      "iconId": "CORE-HOME",
+      "nameHe": "בית",
+      "accessibilityLabel": "חזרה למסך הבית",
+      "scale": "standard",
+      "pixelSize": "96",
+      "state": "idle",
+      "png": "assets/png/home_standard_idle.png",
+      "webp": "assets/webp/home_standard_idle.webp",
+      "lightQa": "true",
+      "navyQa": "true",
+      "source": "existing"
+    },
+    {
+      "priority": "6",
+      "interfaceKey": "nav.back",
+      "iconId": "CORE-BACK",
+      "nameHe": "חזרה",
+      "accessibilityLabel": "חזרה למסך הקודם",
+      "scale": "standard",
+      "pixelSize": "96",
+      "state": "idle",
+      "png": "assets/png/back_standard_idle.png",
+      "webp": "assets/webp/back_standard_idle.webp",
+      "lightQa": "true",
+      "navyQa": "true",
+      "source": "existing"
+    },
+    {
+      "priority": "7",
+      "interfaceKey": "nav.next",
+      "iconId": "CORE-NEXT",
+      "nameHe": "הבא",
+      "accessibilityLabel": "מעבר לשלב הבא",
+      "scale": "standard",
+      "pixelSize": "96",
+      "state": "idle",
+      "png": "assets/png/next_standard_idle.png",
+      "webp": "assets/webp/next_standard_idle.webp",
+      "lightQa": "true",
+      "navyQa": "true",
+      "source": "existing"
+    },
+    {
+      "priority": "8",
+      "interfaceKey": "nav.previous",
+      "iconId": "CORE-PREVIOUS",
+      "nameHe": "הקודם",
+      "accessibilityLabel": "מעבר לשלב הקודם",
+      "scale": "standard",
+      "pixelSize": "96",
+      "state": "idle",
+      "png": "assets/png/previous_standard_idle.png",
+      "webp": "assets/webp/previous_standard_idle.webp",
+      "lightQa": "true",
+      "navyQa": "true",
+      "source": "existing"
+    },
+    {
+      "priority": "9",
+      "interfaceKey": "nav.close",
+      "iconId": "CORE-CLOSE",
+      "nameHe": "סגירה",
+      "accessibilityLabel": "סגירת החלון",
+      "scale": "standard",
+      "pixelSize": "96",
+      "state": "idle",
+      "png": "assets/png/close_standard_idle.png",
+      "webp": "assets/webp/close_standard_idle.webp",
+      "lightQa": "true",
+      "navyQa": "true",
+      "source": "existing"
+    },
+    {
+      "priority": "10",
+      "interfaceKey": "action.confirm",
+      "iconId": "CORE-CONFIRM",
+      "nameHe": "אישור",
+      "accessibilityLabel": "אישור הבחירה",
+      "scale": "standard",
+      "pixelSize": "96",
+      "state": "idle",
+      "png": "assets/png/confirm_standard_idle.png",
+      "webp": "assets/webp/confirm_standard_idle.webp",
+      "lightQa": "true",
+      "navyQa": "true",
+      "source": "existing"
+    },
+    {
+      "priority": "11",
+      "interfaceKey": "feedback.tryAgain",
+      "iconId": "FEEDBACK-TRY-AGAIN",
+      "nameHe": "נסה שוב",
+      "accessibilityLabel": "ניסיון נוסף",
+      "scale": "standard",
+      "pixelSize": "96",
+      "state": "default",
+      "png": "assets/png/try-again_standard_default.png",
+      "webp": "assets/webp/try-again_standard_default.webp",
+      "lightQa": "true",
+      "navyQa": "true",
+      "source": "existing"
+    }
+  ],
+  "files": [
+    {
+      "file": "play_standard_idle.png",
+      "iconId": "CORE-PLAY",
+      "sha256": "5f4f7cc4b37740573d08916984268a2e04788bee5f2c62b708031962089dcd47"
+    },
+    {
+      "file": "stop_standard_idle.png",
+      "iconId": "CORE-STOP",
+      "sha256": "469df3a6ca3ac13862fb8cdb92beca584cd9b3bc20ce728175b696cd6812601b"
+    },
+    {
+      "file": "hear-again_standard_idle.png",
+      "iconId": "CORE-HEAR-AGAIN",
+      "sha256": "67e7a30f66c6e552670935ad5a46261b3cbe8c2c3e19455d3b2043288cd78ccb"
+    },
+    {
+      "file": "hint_standard_idle.png",
+      "iconId": "CORE-HINT",
+      "sha256": "eabe96f38d16485bd2c2f1dd203f59ebedbdb63e182c8711cb52216460548cac"
+    },
+    {
+      "file": "home_standard_idle.png",
+      "iconId": "CORE-HOME",
+      "sha256": "f3e121c38c02023c783335c96fb6679a939d52a7c39d94dc607db80267ec8043"
+    },
+    {
+      "file": "back_standard_idle.png",
+      "iconId": "CORE-BACK",
+      "sha256": "1ac5acce512d20ecb296afd26cc4c72a63ffec3608fd0ae7553fb8cefd5e3938"
+    },
+    {
+      "file": "next_standard_idle.png",
+      "iconId": "CORE-NEXT",
+      "sha256": "91cf84c69bbc6a15c7b410849095efeef83432fd26520ea0b4252949d12a5128"
+    },
+    {
+      "file": "previous_standard_idle.png",
+      "iconId": "CORE-PREVIOUS",
+      "sha256": "481c279e5994ed6fc0d5ef176b719318b663180a3855430eacd564c75226d2ce"
+    },
+    {
+      "file": "close_standard_idle.png",
+      "iconId": "CORE-CLOSE",
+      "sha256": "70ba2353245f24a7d9613a07b80d02c2fcaae8f4f5b3eeee3be8ebee1f680f8d"
+    },
+    {
+      "file": "confirm_standard_idle.png",
+      "iconId": "CORE-CONFIRM",
+      "sha256": "756f900218a2a8ac012fd08eb1ce3c5c18346eddb993118548f4335af884eb00"
+    },
+    {
+      "file": "try-again_standard_default.png",
+      "iconId": "FEEDBACK-TRY-AGAIN",
+      "sha256": "b44155f5cd0b48b25714448948e044e2b663ddbd0f4f5753fe430393c573576c"
+    }
+  ]
+}

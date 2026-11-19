@@ -1,112 +1,96 @@
 'use client'
+import { CharacterIntro } from '@/components/characters/CharacterCompanions'
 
-import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { AppShell }   from '@/components/layout/AppShell'
+import Link from 'next/link'
+import { useEffect, useRef, useState } from 'react'
+import { AppShell } from '@/components/layout/AppShell'
 import { BackHeader } from '@/components/layout/BackHeader'
-import { Card }       from '@/components/ui/Card'
-import { WaveBar }    from '@/components/ui/WaveBar'
-import { BRAND }      from '@/lib/constants'
-import { MOCK_SONGS } from '@/lib/mockData'
-
-const TABS = [
-  { id: 'songs', label: '🎵 שירים', count: 6 },
-  { id: 'clips', label: '🎬 קליפים', count: 4 },
-  { id: 'mine',  label: '⭐ שלי',   count: 2 },
-]
+import { NarrationReader } from '@/components/audio/NarrationReader'
+import { useNarration } from '@/hooks/useNarration'
+import { NARRATION } from '@/lib/narrationCatalog'
+import { BRAND } from '@/lib/constants'
+import { playMusic, stopMusic } from '@/lib/audio'
+import { CATALOG_KEY, CATALOG_URL, DEMO_TRACKS, playableCatalogRow, getApprovedRecording, type LibraryTrack } from '@/lib/catalog'
 
 export default function LibraryPage() {
-  const [tab,     setTab]     = useState('songs')
-  const [query,   setQuery]   = useState('')
-  const [playing, setPlaying] = useState<number | null>(null)
-
-  const songs = MOCK_SONGS.filter(s =>
-    !query || s.title.includes(query) || s.artist.includes(query)
-  )
-
-  return (
-    <AppShell bg="#f0fdf4">
-      <BackHeader title="ספריית שירים וקליפים 📂" bg={BRAND.green} />
-      <div className="p-4 space-y-3">
-
-        {/* Search */}
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
-          <input value={query} onChange={e => setQuery(e.target.value)}
-            placeholder="🔍 חיפוש שיר..."
-            style={{
-              width: '100%', padding: '14px 16px', borderRadius: 14,
-              border: '2px solid #e5e7eb', fontSize: 16,
-              fontFamily: 'inherit', outline: 'none', direction: 'rtl',
-              transition: 'border 0.2s', boxSizing: 'border-box',
-            }}
-            onFocus={e => (e.target.style.borderColor = BRAND.green)}
-            onBlur={e => (e.target.style.borderColor = '#e5e7eb')}
-          />
-        </motion.div>
-
-        {/* Tabs */}
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-          <div style={{ display: 'flex', gap: 8 }}>
-            {TABS.map(t => (
-              <button key={t.id} onClick={() => setTab(t.id)} style={{
-                flex: 1, padding: '11px 4px', borderRadius: 12, border: 'none',
-                background: tab === t.id ? BRAND.green : '#e5e7eb',
-                color: tab === t.id ? 'white' : '#6b7280',
-                fontWeight: 800, fontSize: 13, fontFamily: 'inherit',
-                cursor: 'pointer', transition: 'all 0.2s',
-              }}>{t.label} ({t.count})</button>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-          {songs.map((song, i) => (
-            <motion.div key={song.id}
-              initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.12 + i * 0.07 }}
-              whileTap={{ scale: 0.97 }}>
-              <Card style={{ padding: 12, cursor: 'pointer' }}
-                onClick={() => setPlaying(playing === song.id ? null : song.id)}>
-
-                {/* Thumbnail */}
-                <div style={{
-                  height: 80, borderRadius: 14, marginBottom: 10,
-                  background: `linear-gradient(135deg,${song.color}30,${song.color}10)`,
-                  border: `2px solid ${song.color}33`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  overflow: 'hidden',
-                }}>
-                  {playing === song.id
-                    ? <WaveBar active count={9} color={song.color} height={40} />
-                    : <span style={{ fontSize: 36 }}>{song.emoji}</span>
-                  }
-                </div>
-
-                <div className="font-black" style={{ fontSize: 14, color: BRAND.navy }}>{song.title}</div>
-                <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2, marginBottom: 8 }}>{song.artist}</div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: 11, color: '#9ca3af' }}>{song.duration}</span>
-                  <div style={{
-                    width: 30, height: 30, borderRadius: 9, background: song.color,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: 'white', fontSize: 13,
-                  }}>{playing === song.id ? '⏸' : '▶'}</div>
-                </div>
-              </Card>
-            </motion.div>
-          ))}
+  const [playing,setPlaying] = useState<string|null>(null)
+  const [catalog,setCatalog] = useState<LibraryTrack[]>(DEMO_TRACKS)
+  const [source,setSource] = useState<'loading'|'live'|'fallback'>('loading')
+  const [message,setMessage] = useState('')
+  const narration = useNarration()
+  const requestId = useRef(0)
+  const request = useRef<AbortController|null>(null)
+  const recording = useRef<HTMLAudioElement|null>(null)
+  const objectUrl = useRef<string|null>(null)
+  const stop = () => {
+    requestId.current++; request.current?.abort(); request.current=null
+    stopMusic()
+    if (recording.current) { recording.current.pause(); recording.current.removeAttribute('src'); recording.current.load(); recording.current=null }
+    if (objectUrl.current) { URL.revokeObjectURL(objectUrl.current); objectUrl.current=null }
+  }
+  useEffect(() => {
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(),8000)
+    fetch(`${CATALOG_URL}/rest/v1/song_catalog?select=*&published=eq.true&rights_status=eq.cleared&order=sort_order.asc`,{
+      headers:{apikey:CATALOG_KEY},signal:controller.signal,
+    }).then(async r => {if(!r.ok)throw new Error('catalog');return r.json()})
+      .then((rows:unknown) => {
+        if (!Array.isArray(rows)) throw new Error('catalog')
+        const approved=rows.map(playableCatalogRow).filter((t):t is LibraryTrack => t!==null)
+        setCatalog(approved); setSource('live')
+      }).catch(() => {setSource('fallback')})
+      .finally(() => clearTimeout(timeout))
+    return () => {clearTimeout(timeout);controller.abort()}
+  },[])
+  useEffect(() => {
+    const leave = () => {stop();setPlaying(null)}
+    window.addEventListener('pagehide',leave)
+    return () => {window.removeEventListener('pagehide',leave);stop()}
+  },[])
+  const toggle = async (track:LibraryTrack) => {
+    const wasPlaying = playing===track.id
+    stop(); narration.reset(); setPlaying(null); setMessage('')
+    if(wasPlaying)return
+    const current=requestId.current
+    setPlaying(track.id)
+    try {
+      if(track.audio.kind==='builtin') {
+        await playMusic(track.audio.id,() => {if(current===requestId.current)setPlaying(null)})
+      } else {
+        const controller = new AbortController();request.current=controller
+        const url=await getApprovedRecording(track,controller.signal)
+        if(current!==requestId.current){URL.revokeObjectURL(url);return}
+        objectUrl.current=url
+        const audio=new Audio(url);recording.current=audio
+        audio.onended=() => {if(current===requestId.current){stop();setPlaying(null)}}
+        audio.onerror=() => {if(current===requestId.current){stop();setPlaying(null);setMessage('השמע אינו זמין כרגע. נסו שוב.')}}
+        await audio.play()
+      }
+    } catch {
+      if(current!==requestId.current)return
+      stop();setPlaying(null);setMessage('לא הצלחנו להשמיע. בדקו את החיבור ואת עוצמת הקול ונסו שוב.')
+    }
+  }
+  return <AppShell bg="#f0f9ff">
+    <BackHeader title="ספריית השירים 🎵" bg={BRAND.cyan} onBack={() => { stop(); narration.reset() }}/>
+    <div className="p-4 space-y-4" dir="rtl">
+      <Link href="/guide" className="inline-flex min-h-12 items-center rounded-xl px-3 py-2 text-base font-bold text-indigo-800">🎬 צפו בהדרכת הספרייה</Link>
+      <CharacterIntro character="G"><p className="text-sm text-slate-700 font-semibold">בחרו קטע, הקשיבו לצלילים והצטרפו לקצב. אפשר לשמוע שוב כמה שרוצים.</p></CharacterIntro>
+      {source==='fallback' && <p className="text-sm text-amber-900 bg-amber-50 rounded-xl p-2">אין כרגע חיבור לקטלוג. שלושת קטעי ההתנסות זמינים במכשיר.</p>}
+      {source==='live' && !catalog.length && <p role="status">עדיין אין שירים מאושרים להשמעה.</p>}
+      {catalog.map(track => <section key={track.id} className="rounded-2xl bg-white shadow-sm border border-slate-100 p-4" aria-label={track.title}>
+        <div className="flex items-center gap-3">
+          <span className="text-4xl" aria-hidden="true">{track.emoji}</span>
+          <div className="flex-1"><h2 className="font-black text-lg" style={{color:BRAND.navy}}>{track.title}</h2><p className="text-sm text-slate-600">{track.audio.kind==='builtin'?'קטע אינסטרומנטלי מקורי':track.audio.format==='sung'?'הקלטת שירה':'קטע אינסטרומנטלי'} · {track.duration}</p></div>
         </div>
-
-        {songs.length === 0 && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            style={{ textAlign: 'center', padding: '32px 0', color: '#9ca3af' }}>
-            <div style={{ fontSize: 40, marginBottom: 8 }}>🔍</div>
-            <div style={{ fontWeight: 700 }}>לא נמצאו שירים</div>
-          </motion.div>
-        )}
-
-      </div>
-    </AppShell>
-  )
+        {!track.narrationId && <p className="my-3 text-base text-slate-700">{track.prompt}</p>}
+        <button type="button" onClick={() => toggle(track)} className="mt-3 w-full rounded-xl px-3 py-3 font-bold text-white" style={{background:playing===track.id?BRAND.navy:BRAND.purple}} aria-label={`${playing===track.id?'עצור':'נגן'} ${track.title}`}>
+          {playing===track.id?'⏹ עצור':'▶ השמיעו לי'}
+        </button>
+        {track.narrationId && <NarrationReader asset={NARRATION[track.narrationId]} player={narration} label={`ההסבר על ${track.title}`} beforePlay={() => {stop();setPlaying(null);setMessage('')}}/>}
+      </section>)}
+      {message && <p role="status" className="rounded-xl bg-indigo-50 p-3 text-sm text-indigo-900">{message}</p>}
+      <p className="text-sm text-slate-600">שירים מוכרים יצטרפו לספרייה לאחר אישור הזכויות וההקלטה.</p>
+    </div>
+  </AppShell>
 }

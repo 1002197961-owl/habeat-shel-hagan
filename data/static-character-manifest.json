@@ -1,0 +1,74 @@
+[
+  {
+    "character": "R",
+    "label": "קצב",
+    "viewportPx": {
+      "x": 20,
+      "y": 112,
+      "width": 335,
+      "height": 333
+    },
+    "outputFile": "Front_R_v1.png",
+    "outputSHA256": "79c16f3463755ec85d797523d4957233e234678d037fdd9b455466463a3a450e",
+    "outputDimensions": {
+      "width": 335,
+      "height": 333
+    },
+    "pixelVerification": {
+      "mode": "RGB",
+      "rowMajorPixelSHA256": "16d4ac8a25dc64e8c9e7129a4bb776a56abfb9f58ef8495550d932d891e68a53",
+      "allPixelsEqualSourceRectangle": true,
+      "comparedPixelCount": 111555,
+      "method": "Exact integer source rectangle, no resizing or color conversion; saved PNG re-decoded and every pixel byte compared."
+    },
+    "extraction": "Deterministic lossless FRONT rectangle; no redraw, recolor, transparency edit, background removal, resampling, animation or other pose."
+  },
+  {
+    "character": "G",
+    "label": "נגינה",
+    "viewportPx": {
+      "x": 58,
+      "y": 88,
+      "width": 255,
+      "height": 420
+    },
+    "outputFile": "Front_G_v1.png",
+    "outputSHA256": "08714065c351df3349ef5a20d9efe36171a45fa583fdc049751c87d53751ede0",
+    "outputDimensions": {
+      "width": 255,
+      "height": 420
+    },
+    "pixelVerification": {
+      "mode": "RGB",
+      "rowMajorPixelSHA256": "3cf8e152efe80ddb1cebdaf2c740fd5caedc6c5bf4a793f10ed5a411819d6207",
+      "allPixelsEqualSourceRectangle": true,
+      "comparedPixelCount": 107100,
+      "method": "Exact integer source rectangle, no resizing or color conversion; saved PNG re-decoded and every pixel byte compared."
+    },
+    "extraction": "Deterministic lossless FRONT rectangle; no redraw, recolor, transparency edit, background removal, resampling, animation or other pose."
+  },
+  {
+    "character": "M",
+    "label": "צלילים",
+    "viewportPx": {
+      "x": 80,
+      "y": 53,
+      "width": 244,
+      "height": 415
+    },
+    "outputFile": "Front_M_v1.png",
+    "outputSHA256": "6f09f6f9f10289e7bf75d76f2b09589d5c2aec12428df70f9e648332ed0c8c8c",
+    "outputDimensions": {
+      "width": 244,
+      "height": 415
+    },
+    "pixelVerification": {
+      "mode": "RGB",
+      "rowMajorPixelSHA256": "c8f75ac3cc5697a75173d2241a0f43d0fcf0e2531bd4ab265d13afa05f192de9",
+      "allPixelsEqualSourceRectangle": true,
+      "comparedPixelCount": 101260,
+      "method": "Exact integer source rectangle, no resizing or color conversion; saved PNG re-decoded and every pixel byte compared."
+    },
+    "extraction": "Deterministic lossless FRONT rectangle; no redraw, recolor, transparency edit, background removal, resampling, animation or other pose."
+  }
+]
